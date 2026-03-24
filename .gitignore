@@ -1,0 +1,18 @@
+# VS Code source — cloned at build time, never committed
+vscode/
+
+# Build outputs
+VSCode-darwin-x64/
+VSCode-darwin-arm64/
+VSCode-win32-x64/
+VSCode-linux-x64/
+*.dmg
+*.zip
+*.tar.gz
+
+# Extension node_modules — committed compiled out/ is enough
+extension/node_modules/
+
+# Icons (add your own SVG/PNG)
+icons/*.icns
+icons/*.ico

@@ -1,0 +1,66 @@
+{
+  "nameShort": "Orkestra IDE",
+  "nameLong": "Orkestra IDE",
+  "applicationName": "orkestra-ide",
+  "dataFolderName": ".orkestra-ide",
+  "win32MutexName": "orchestraIDE",
+  "win32DirName": "Orkestra IDE",
+  "win32NameVersion": "Orkestra IDE",
+  "win32RegValueName": "OrchestraIDE",
+  "win32AppId": "{{2B71B9A4-A5D2-4E7A-B3C1-8F4C2D9E1A6B}",
+  "win32x64AppId": "{{3C82CAB5-B6E3-5F8B-C4D2-9G5D3E0B2B7C}",
+  "win32arm64AppId": "{{4D93DBC6-C7F4-6G9C-D5E3-0H6E4F1C3C8D}",
+  "win32AppUserModelId": "OrchestraAI.OrchestraIDE",
+  "win32ShellNameShort": "Orkestra &IDE",
+  "darwinBundleIdentifier": "ai.orkestra.ide",
+  "linuxIconName": "orkestra-ide",
+  "licenseUrl": "https://github.com/orkestra-ai/orkestra-ide/blob/main/LICENSE.txt",
+  "documentationUrl": "https://docs.orkestra.ai",
+  "releaseNotesUrl": "https://github.com/orkestra-ai/orkestra-ide/releases",
+  "keyboardShortcutsUrlMac": "https://docs.orkestra.ai/shortcuts",
+  "keyboardShortcutsUrlLinux": "https://docs.orkestra.ai/shortcuts",
+  "keyboardShortcutsUrlWin": "https://docs.orkestra.ai/shortcuts",
+  "introductoryVideosUrl": "https://docs.orkestra.ai/videos",
+  "tipsAndTricksUrl": "https://docs.orkestra.ai/tips",
+  "newsletterSignupUrl": "https://orkestra.ai",
+  "quality": "stable",
+  "commit": "REPLACE_WITH_COMMIT",
+  "date": "REPLACE_WITH_DATE",
+  "extensionsGallery": {
+    "serviceUrl": "https://open-vsx.org/vscode/gallery",
+    "itemUrl": "https://open-vsx.org/vscode/item",
+    "resourceUrlTemplate": "https://open-vsx.org/vscode/unpkg/{publisher}/{name}/{version}/{path}",
+    "controlUrl": "",
+    "recommendationsUrl": ""
+  },
+  "linkProtectionTrustedDomains": [
+    "https://orkestra.ai",
+    "https://open-vsx.org"
+  ],
+  "telemetryOptOutUrl": "",
+  "enableTelemetry": false,
+  "aiConfig": {
+    "ariaKey": ""
+  },
+  "msftInternalDomains": [],
+  "builtInExtensions": [
+    {
+      "name": "orkestra-ai.orkestra",
+      "version": "0.1.0",
+      "repo": "https://github.com/orkestra-ai/vscode-orkestra",
+      "metadata": {
+        "id": "orkestra-built-in",
+        "publisherId": { "publisherId": "orkestra-ai", "publisherName": "orkestra-ai", "displayName": "Orkestra AI", "flags": "" },
+        "publisherDisplayName": "Orkestra AI"
+      }
+    }
+  ],
+  "webEndpointUrlTemplate": "https://editor.orkestra.ai/v--{{commit}}",
+  "webviewContentExternalBaseUrlTemplate": "https://editor.orkestra.ai/v--{{commit}}/out/vs/workbench/contrib/webview/browser/pre/",
+  "crash-reporter": {
+    "companyName": "Orkestra AI",
+    "productName": "Orkestra IDE"
+  },
+  "workspaceTrustEnabled": true,
+  "defaultXDGCurrentDesktopValue": "orkestra-ide"
+}

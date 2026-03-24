@@ -1,0 +1,145 @@
+{
+  "name": "orkestra",
+  "displayName": "Orkestra AI",
+  "description": "Multi-agent AI coding assistant — Planner → Backend → Frontend → QA, right inside VS Code",
+  "version": "0.1.0",
+  "publisher": "orkestra-ai",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["AI", "Other"],
+  "keywords": ["ai", "agent", "code generation", "orkestra", "llm"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "orkestra.newRun",
+        "title": "Orkestra: New Run",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "orkestra.openPanel",
+        "title": "Orkestra: Open Panel"
+      },
+      {
+        "command": "orkestra.sendSelection",
+        "title": "Orkestra: Send Selection as Context"
+      },
+      {
+        "command": "orkestra.configure",
+        "title": "Orkestra: Configure API Key"
+      },
+      {
+        "command": "orkestra.refreshRuns",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "orkestra.cancelRun",
+        "title": "Cancel Run",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "orkestra.downloadRun",
+        "title": "Download Files",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "orkestra.applyFiles",
+        "title": "Apply to Workspace",
+        "icon": "$(check)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "orkestra",
+          "title": "Orkestra AI",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "orkestra": [
+        {
+          "type": "webview",
+          "id": "orkestra.mainView",
+          "name": "Orkestra"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "orkestra.newRun",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o"
+      },
+      {
+        "command": "orkestra.sendSelection",
+        "key": "ctrl+shift+alt+o",
+        "mac": "cmd+shift+alt+o",
+        "when": "editorHasSelection"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "orkestra.sendSelection",
+          "when": "editorHasSelection",
+          "group": "orkestra"
+        },
+        {
+          "command": "orkestra.newRun",
+          "group": "orkestra"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "orkestra.refreshRuns",
+          "when": "view == orkestra.mainView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Orkestra",
+      "properties": {
+        "orkestra.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your Orkestra API key (sk_...)"
+        },
+        "orkestra.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:8001",
+          "description": "Orkestra backend URL"
+        },
+        "orkestra.autoApplyFiles": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically apply generated files to workspace when run completes"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "@types/ws": "^8.5.10",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.24.0"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}

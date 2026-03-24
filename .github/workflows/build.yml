@@ -1,0 +1,278 @@
+name: Build Orkestra IDE
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      vscode_tag:
+        description: 'VS Code tag to build from'
+        required: false
+        default: '1.87.2'
+      orkestra_version:
+        description: 'Orkestra IDE version'
+        required: false
+        default: '0.1.0'
+
+env:
+  VSCODE_TAG: ${{ github.event.inputs.vscode_tag || '1.87.2' }}
+  ORKESTRA_VERSION: ${{ github.event.inputs.orkestra_version || github.ref_name != '' && github.ref_name || '0.1.0' }}
+  NODE_VERSION: '20'
+
+# ─────────────────────────────────────────────────────────────────────────────
+jobs:
+
+  # ── macOS ──────────────────────────────────────────────────────────────────
+  build-macos:
+    name: macOS (x64 + arm64)
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Python & pkg-config
+        run: brew install python@3.11 pkg-config || true
+
+      - name: Clone VS Code ${{ env.VSCODE_TAG }}
+        run: |
+          git clone --depth 1 --branch ${{ env.VSCODE_TAG }} \
+            https://github.com/microsoft/vscode.git vscode
+
+      - name: Cache VS Code node_modules
+        uses: actions/cache@v4
+        id: cache-node-mac
+        with:
+          path: vscode/node_modules
+          key: macos-vscode-${{ env.VSCODE_TAG }}-node${{ env.NODE_VERSION }}-${{ hashFiles('vscode/package.json') }}
+
+      - name: Apply branding
+        run: |
+          COMMIT=$(cd vscode && git rev-parse HEAD)
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
+            product.json > vscode/product.json
+
+      - name: Copy built-in extension
+        run: bash scripts/copy_extension.sh
+
+      - name: Install dependencies
+        if: steps.cache-node-mac.outputs.cache-hit != 'true'
+        working-directory: vscode
+        run: npm install --legacy-peer-deps
+
+      - name: Build macOS x64
+        working-directory: vscode
+        run: npm run gulp vscode-darwin-x64
+
+      - name: Build macOS arm64
+        working-directory: vscode
+        run: npm run gulp vscode-darwin-arm64
+
+      - name: Create DMG (x64)
+        run: |
+          APP="VSCode-darwin-x64"
+          hdiutil create \
+            -volname "Orkestra IDE" \
+            -srcfolder "${APP}" \
+            -ov -format UDZO \
+            "orkestra-ide-${{ env.ORKESTRA_VERSION }}-darwin-x64.dmg"
+
+      - name: Create DMG (arm64)
+        run: |
+          APP="VSCode-darwin-arm64"
+          hdiutil create \
+            -volname "Orkestra IDE" \
+            -srcfolder "${APP}" \
+            -ov -format UDZO \
+            "orkestra-ide-${{ env.ORKESTRA_VERSION }}-darwin-arm64.dmg"
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: '*.dmg'
+          retention-days: 7
+
+  # ── Windows ────────────────────────────────────────────────────────────────
+  build-windows:
+    name: Windows (x64)
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Clone VS Code ${{ env.VSCODE_TAG }}
+        shell: bash
+        run: |
+          git clone --depth 1 --branch ${{ env.VSCODE_TAG }} \
+            https://github.com/microsoft/vscode.git vscode
+
+      - name: Cache VS Code node_modules
+        uses: actions/cache@v4
+        id: cache-node-win
+        with:
+          path: vscode/node_modules
+          key: windows-vscode-${{ env.VSCODE_TAG }}-node${{ env.NODE_VERSION }}-${{ hashFiles('vscode/package.json') }}
+
+      - name: Apply branding
+        shell: bash
+        run: |
+          COMMIT=$(cd vscode && git rev-parse HEAD)
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
+            product.json > vscode/product.json
+
+      - name: Copy built-in extension
+        shell: bash
+        run: bash scripts/copy_extension.sh
+
+      - name: Install dependencies
+        if: steps.cache-node-win.outputs.cache-hit != 'true'
+        working-directory: vscode
+        run: npm install --legacy-peer-deps
+
+      - name: Build Windows x64
+        working-directory: vscode
+        run: npm run gulp vscode-win32-x64
+
+      - name: Create ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "VSCode-win32-x64\*" `
+            -DestinationPath "orkestra-ide-${{ env.ORKESTRA_VERSION }}-windows-x64.zip"
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: '*.zip'
+          retention-days: 7
+
+  # ── Linux ──────────────────────────────────────────────────────────────────
+  build-linux:
+    name: Linux (x64)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential pkg-config \
+            libx11-dev libxkbfile-dev libsecret-1-dev libkrb5-dev \
+            fakeroot rpm python3-distutils
+
+      - name: Clone VS Code ${{ env.VSCODE_TAG }}
+        run: |
+          git clone --depth 1 --branch ${{ env.VSCODE_TAG }} \
+            https://github.com/microsoft/vscode.git vscode
+
+      - name: Cache VS Code node_modules
+        uses: actions/cache@v4
+        id: cache-node-linux
+        with:
+          path: vscode/node_modules
+          key: linux-vscode-${{ env.VSCODE_TAG }}-node${{ env.NODE_VERSION }}-${{ hashFiles('vscode/package.json') }}
+
+      - name: Apply branding
+        run: |
+          COMMIT=$(cd vscode && git rev-parse HEAD)
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
+            product.json > vscode/product.json
+
+      - name: Copy built-in extension
+        run: bash scripts/copy_extension.sh
+
+      - name: Install dependencies
+        if: steps.cache-node-linux.outputs.cache-hit != 'true'
+        working-directory: vscode
+        run: npm install --legacy-peer-deps
+
+      - name: Build Linux x64
+        working-directory: vscode
+        run: |
+          npm run gulp vscode-linux-x64
+          npm run gulp vscode-linux-x64-build-deb
+          npm run gulp vscode-linux-x64-build-rpm
+
+      - name: Create tar.gz
+        run: |
+          tar -czf "orkestra-ide-${{ env.ORKESTRA_VERSION }}-linux-x64.tar.gz" \
+            VSCode-linux-x64
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            *.tar.gz
+            vscode/*.deb
+            vscode/*.rpm
+          retention-days: 7
+
+  # ── Release ────────────────────────────────────────────────────────────────
+  release:
+    name: Create GitHub Release
+    needs: [build-macos, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Orkestra IDE ${{ github.ref_name }}"
+          body: |
+            ## Orkestra IDE ${{ github.ref_name }}
+
+            Multi-agent AI coding assistant built on VS Code ${{ env.VSCODE_TAG }}.
+
+            **Planner → Backend → Frontend → QA — parallel agents, not one.**
+
+            ### Downloads
+
+            | Platform | File |
+            |----------|------|
+            | macOS (Apple Silicon M1/M2/M3) | `orkestra-ide-*-darwin-arm64.dmg` |
+            | macOS (Intel) | `orkestra-ide-*-darwin-x64.dmg` |
+            | Windows 10/11 x64 | `orkestra-ide-*-windows-x64.zip` |
+            | Linux x64 (.tar.gz) | `orkestra-ide-*-linux-x64.tar.gz` |
+            | Linux x64 (.deb) | `orkestra-ide_*.deb` |
+            | Linux x64 (.rpm) | `orkestra-ide-*.rpm` |
+
+            ### Setup
+            1. Download for your platform
+            2. Run Orkestra IDE
+            3. Open Settings → Extensions → Orkestra → enter your API key
+            4. Press `Ctrl+Shift+O` to start your first run
+          files: |
+            *.dmg
+            *.zip
+            *.tar.gz
+            vscode/*.deb
+            vscode/*.rpm
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: false
