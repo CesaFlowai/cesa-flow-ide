@@ -51,6 +51,18 @@
         "command": "orkestra.applyFiles",
         "title": "Apply to Workspace",
         "icon": "$(check)"
+      },
+      {
+        "command": "orkestra.inlineEdit",
+        "title": "Orkestra: Edit Selection (Cmd+K)"
+      },
+      {
+        "command": "orkestra.chat",
+        "title": "Orkestra: Open Chat (Cmd+L)"
+      },
+      {
+        "command": "orkestra.welcome",
+        "title": "Orkestra: Welcome / Get Started"
       }
     ],
     "viewsContainers": {
@@ -82,6 +94,18 @@
         "key": "ctrl+shift+alt+o",
         "mac": "cmd+shift+alt+o",
         "when": "editorHasSelection"
+      },
+      {
+        "command": "orkestra.inlineEdit",
+        "key": "ctrl+k",
+        "mac": "cmd+k",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "orkestra.chat",
+        "key": "ctrl+l",
+        "mac": "cmd+l",
+        "when": "editorTextFocus || !editorTextFocus"
       }
     ],
     "menus": {

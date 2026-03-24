@@ -117,6 +117,15 @@ class OrkestraApi {
     async getMe() {
         return this.request('GET', '/api/v1/auth/me');
     }
+    async inlineEdit(params) {
+        return this.request('POST', '/api/v1/inline/edit', params);
+    }
+    async chat(params) {
+        return this.request('POST', '/api/v1/inline/chat', params);
+    }
+    async complete(params) {
+        return this.request('POST', '/api/v1/inline/complete', params);
+    }
     openWebSocket(onMessage, onClose) {
         try {
             const wsUrl = this.serverUrl

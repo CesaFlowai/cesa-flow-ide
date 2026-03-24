@@ -1,18 +1,22 @@
 import * as vscode from 'vscode';
 import { OrkestraPanel, OrkestraViewProvider } from './panel';
 import { OrkestraApi } from './api';
+import { registerWelcome } from './welcome';
+import { registerInlineEdit, registerChatPanel, registerTabCompletion } from './inline';
 
 export function activate(context: vscode.ExtensionContext) {
   const api = new OrkestraApi();
   const panel = new OrkestraPanel(context, api);
   const provider = new OrkestraViewProvider(context, panel);
 
+  // ── Sidebar panel ────────────────────────────────────────────────────────
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider('orkestra.mainView', provider, {
       webviewOptions: { retainContextWhenHidden: true },
     })
   );
 
+  // ── Core commands ────────────────────────────────────────────────────────
   context.subscriptions.push(
     vscode.commands.registerCommand('orkestra.newRun', async () => {
       const selection = getEditorSelection();
@@ -52,12 +56,29 @@ export function activate(context: vscode.ExtensionContext) {
       panel.refresh();
     }),
 
+    vscode.commands.registerCommand('orkestra.cancelRun', async (runId: string) => {
+      await api.cancelRun(runId);
+      panel.refresh();
+    }),
+
+    vscode.commands.registerCommand('orkestra.downloadRun', async (runId: string) => {
+      vscode.window.showInformationMessage(`Orkestra: Download run ${runId} from the dashboard.`);
+    }),
+
     vscode.commands.registerCommand('orkestra.applyFiles', async (runId: string) => {
       await applyFilesToWorkspace(api, runId);
     }),
   );
 
-  // Status bar item
+  // ── Phase 2: Inline edit (Cmd+K), Chat (Cmd+L), Tab completion ──────────
+  registerInlineEdit(context, api);
+  registerChatPanel(context, api);
+  registerTabCompletion(context, api);
+
+  // ── Welcome screen (first install) ──────────────────────────────────────
+  registerWelcome(context);
+
+  // ── Status bar ───────────────────────────────────────────────────────────
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   statusBar.command = 'orkestra.openPanel';
   statusBar.text = '$(sparkle) Orkestra';
@@ -102,7 +123,6 @@ async function applyFilesToWorkspace(api: OrkestraApi, runId: string) {
         for (const filePath of files) {
           const fileData = await api.getFile(runId, filePath);
           const targetUri = vscode.Uri.joinPath(workspaceFolder, filePath);
-          // Create parent dirs
           const parentUri = vscode.Uri.joinPath(targetUri, '..');
           try { await vscode.workspace.fs.createDirectory(parentUri); } catch {}
           await vscode.workspace.fs.writeFile(

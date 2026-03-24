@@ -128,6 +128,31 @@ export class OrkestraApi {
     return this.request('GET', '/api/v1/auth/me');
   }
 
+  async inlineEdit(params: {
+    code: string;
+    instruction: string;
+    language: string;
+    filename: string;
+  }): Promise<{ edited_code: string; summary: string }> {
+    return this.request('POST', '/api/v1/inline/edit', params);
+  }
+
+  async chat(params: {
+    message: string;
+    context: string;
+  }): Promise<{ reply: string; has_code: boolean; code?: string; language?: string }> {
+    return this.request('POST', '/api/v1/inline/chat', params);
+  }
+
+  async complete(params: {
+    prefix: string;
+    suffix: string;
+    language: string;
+    filename: string;
+  }): Promise<{ completion: string }> {
+    return this.request('POST', '/api/v1/inline/complete', params);
+  }
+
   openWebSocket(onMessage: (ev: any) => void, onClose: () => void): WebSocket | null {
     try {
       const wsUrl = this.serverUrl
