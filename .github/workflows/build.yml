@@ -229,8 +229,18 @@ jobs:
         run: npm run gulp vscode-win32-x64
 
       - name: Build Windows x64 EXE installers
-        working-directory: vscode
+        shell: pwsh
         run: |
+          # code.iss line 95 requires tools\ directory to exist (inno_updater placeholder)
+          New-Item -ItemType Directory -Force -Path "VSCode-win32-x64\tools" | Out-Null
+          # Find and copy the main exe as inno_updater stub
+          $mainExe = Get-ChildItem -Path "VSCode-win32-x64" -Filter "*.exe" -File | Select-Object -First 1
+          if ($mainExe) {
+            Copy-Item $mainExe.FullName "VSCode-win32-x64\tools\inno_updater.exe" -Force
+          } else {
+            New-Item -ItemType File -Path "VSCode-win32-x64\tools\inno_updater.exe" | Out-Null
+          }
+          Set-Location vscode
           npm run gulp vscode-win32-x64-system-setup
           npm run gulp vscode-win32-x64-user-setup
 
