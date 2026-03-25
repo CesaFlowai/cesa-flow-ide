@@ -64,6 +64,8 @@ jobs:
       - name: Install dependencies
         if: steps.cache-mac.outputs.cache-hit != 'true'
         working-directory: vscode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm install --legacy-peer-deps
 
       - name: Build macOS arm64
@@ -133,6 +135,8 @@ jobs:
       - name: Install dependencies
         if: steps.cache-linux.outputs.cache-hit != 'true'
         working-directory: vscode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm install --legacy-peer-deps
 
       - name: Build Linux x64
@@ -198,6 +202,8 @@ jobs:
       - name: Install dependencies
         if: steps.cache-win.outputs.cache-hit != 'true'
         working-directory: vscode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm install --legacy-peer-deps
 
       - name: Build Windows x64
