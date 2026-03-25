@@ -1,28 +1,28 @@
 {
-  "nameShort": "Orkestra IDE",
-  "nameLong": "Orkestra IDE",
-  "applicationName": "orkestra-ide",
-  "dataFolderName": ".orkestra-ide",
-  "win32MutexName": "orchestraIDE",
-  "win32DirName": "Orkestra IDE",
-  "win32NameVersion": "Orkestra IDE",
-  "win32RegValueName": "OrchestraIDE",
+  "nameShort": "CesaFlow IDE",
+  "nameLong": "CesaFlow IDE",
+  "applicationName": "cesaflow-ide",
+  "dataFolderName": ".cesaflow-ide",
+  "win32MutexName": "cesaflowIDE",
+  "win32DirName": "CesaFlow IDE",
+  "win32NameVersion": "CesaFlow IDE",
+  "win32RegValueName": "CesaFlowIDE",
   "win32AppId": "{{2B71B9A4-A5D2-4E7A-B3C1-8F4C2D9E1A6B}",
   "win32x64AppId": "{{3C82CAB5-B6E3-5F8B-C4D2-9G5D3E0B2B7C}",
   "win32arm64AppId": "{{4D93DBC6-C7F4-6G9C-D5E3-0H6E4F1C3C8D}",
-  "win32AppUserModelId": "OrchestraAI.OrchestraIDE",
-  "win32ShellNameShort": "Orkestra &IDE",
-  "darwinBundleIdentifier": "ai.orkestra.ide",
-  "linuxIconName": "orkestra-ide",
-  "licenseUrl": "https://github.com/orkestra-ai/orkestra-ide/blob/main/LICENSE.txt",
-  "documentationUrl": "https://docs.orkestra.ai",
-  "releaseNotesUrl": "https://github.com/orkestra-ai/orkestra-ide/releases",
-  "keyboardShortcutsUrlMac": "https://docs.orkestra.ai/shortcuts",
-  "keyboardShortcutsUrlLinux": "https://docs.orkestra.ai/shortcuts",
-  "keyboardShortcutsUrlWin": "https://docs.orkestra.ai/shortcuts",
-  "introductoryVideosUrl": "https://docs.orkestra.ai/videos",
-  "tipsAndTricksUrl": "https://docs.orkestra.ai/tips",
-  "newsletterSignupUrl": "https://orkestra.ai",
+  "win32AppUserModelId": "CesaFlowAI.CesaFlowIDE",
+  "win32ShellNameShort": "CesaFlow &IDE",
+  "darwinBundleIdentifier": "ai.cesaflow.ide",
+  "linuxIconName": "cesaflow-ide",
+  "licenseUrl": "https://github.com/CesaFlowai/cesa-flow-ide/blob/main/LICENSE.txt",
+  "documentationUrl": "https://docs.cesaflow.ai",
+  "releaseNotesUrl": "https://github.com/CesaFlowai/cesa-flow-ide/releases",
+  "keyboardShortcutsUrlMac": "https://docs.cesaflow.ai/shortcuts",
+  "keyboardShortcutsUrlLinux": "https://docs.cesaflow.ai/shortcuts",
+  "keyboardShortcutsUrlWin": "https://docs.cesaflow.ai/shortcuts",
+  "introductoryVideosUrl": "https://docs.cesaflow.ai/videos",
+  "tipsAndTricksUrl": "https://docs.cesaflow.ai/tips",
+  "newsletterSignupUrl": "https://cesaflow.ai",
   "quality": "stable",
   "commit": "REPLACE_WITH_COMMIT",
   "date": "REPLACE_WITH_DATE",
@@ -34,7 +34,7 @@
     "recommendationsUrl": ""
   },
   "linkProtectionTrustedDomains": [
-    "https://orkestra.ai",
+    "https://cesaflow.ai",
     "https://open-vsx.org"
   ],
   "telemetryOptOutUrl": "",
@@ -45,22 +45,22 @@
   "msftInternalDomains": [],
   "builtInExtensions": [
     {
-      "name": "orkestra-ai.orkestra",
-      "version": "0.1.0",
-      "repo": "https://github.com/orkestra-ai/vscode-orkestra",
+      "name": "cesaflow-ai.cesaflow",
+      "version": "1.0.0",
+      "repo": "https://github.com/CesaFlowai/cesa-flow-ide",
       "metadata": {
-        "id": "orkestra-built-in",
-        "publisherId": { "publisherId": "orkestra-ai", "publisherName": "orkestra-ai", "displayName": "Orkestra AI", "flags": "" },
-        "publisherDisplayName": "Orkestra AI"
+        "id": "cesaflow-built-in",
+        "publisherId": { "publisherId": "cesaflow-ai", "publisherName": "cesaflow-ai", "displayName": "CesaFlow AI", "flags": "" },
+        "publisherDisplayName": "CesaFlow AI"
       }
     }
   ],
-  "webEndpointUrlTemplate": "https://editor.orkestra.ai/v--{{commit}}",
-  "webviewContentExternalBaseUrlTemplate": "https://editor.orkestra.ai/v--{{commit}}/out/vs/workbench/contrib/webview/browser/pre/",
+  "webEndpointUrlTemplate": "https://editor.cesaflow.ai/v--{{commit}}",
+  "webviewContentExternalBaseUrlTemplate": "https://editor.cesaflow.ai/v--{{commit}}/out/vs/workbench/contrib/webview/browser/pre/",
   "crash-reporter": {
-    "companyName": "Orkestra AI",
-    "productName": "Orkestra IDE"
+    "companyName": "CesaFlow AI",
+    "productName": "CesaFlow IDE"
   },
   "workspaceTrustEnabled": true,
-  "defaultXDGCurrentDesktopValue": "orkestra-ide"
+  "defaultXDGCurrentDesktopValue": "cesaflow-ide"
 }

@@ -1,4 +1,4 @@
-name: Build Orkestra IDE
+name: Build CesaFlow IDE
 
 on:
   push:
@@ -10,14 +10,14 @@ on:
         description: 'VS Code tag to build from'
         required: false
         default: '1.87.2'
-      orkestra_version:
-        description: 'Orkestra IDE version'
+      cesaflow_version:
+        description: 'CesaFlow IDE version'
         required: false
         default: '0.1.0'
 
 env:
   VSCODE_TAG: ${{ github.event.inputs.vscode_tag || '1.87.2' }}
-  ORKESTRA_VERSION: ${{ github.event.inputs.orkestra_version || github.ref_name != '' && github.ref_name || '0.1.0' }}
+  CESAFLOW_VERSION: ${{ github.event.inputs.cesaflow_version || github.ref_name != '' && github.ref_name || '0.1.0' }}
   NODE_VERSION: '20'
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -77,19 +77,19 @@ jobs:
         run: |
           APP="VSCode-darwin-x64"
           hdiutil create \
-            -volname "Orkestra IDE" \
+            -volname "CesaFlow IDE" \
             -srcfolder "${APP}" \
             -ov -format UDZO \
-            "orkestra-ide-${{ env.ORKESTRA_VERSION }}-darwin-x64.dmg"
+            "cesaflow-ide-${{ env.CESAFLOW_VERSION }}-darwin-x64.dmg"
 
       - name: Create DMG (arm64)
         run: |
           APP="VSCode-darwin-arm64"
           hdiutil create \
-            -volname "Orkestra IDE" \
+            -volname "CesaFlow IDE" \
             -srcfolder "${APP}" \
             -ov -format UDZO \
-            "orkestra-ide-${{ env.ORKESTRA_VERSION }}-darwin-arm64.dmg"
+            "cesaflow-ide-${{ env.CESAFLOW_VERSION }}-darwin-arm64.dmg"
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
@@ -148,7 +148,7 @@ jobs:
         shell: pwsh
         run: |
           Compress-Archive -Path "VSCode-win32-x64\*" `
-            -DestinationPath "orkestra-ide-${{ env.ORKESTRA_VERSION }}-windows-x64.zip"
+            -DestinationPath "cesaflow-ide-${{ env.CESAFLOW_VERSION }}-windows-x64.zip"
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
@@ -213,7 +213,7 @@ jobs:
 
       - name: Create tar.gz
         run: |
-          tar -czf "orkestra-ide-${{ env.ORKESTRA_VERSION }}-linux-x64.tar.gz" \
+          tar -czf "cesaflow-ide-${{ env.CESAFLOW_VERSION }}-linux-x64.tar.gz" \
             VSCode-linux-x64
 
       - name: Upload Linux artifacts
@@ -243,29 +243,29 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Orkestra IDE ${{ github.ref_name }}"
+          name: "CesaFlow IDE ${{ github.ref_name }}"
           body: |
-            ## Orkestra IDE ${{ github.ref_name }}
+            ## CesaFlow IDE ${{ github.ref_name }}
 
-            Multi-agent AI coding assistant built on VS Code ${{ env.VSCODE_TAG }}.
+            AI-powered coding assistant built on VS Code ${{ env.VSCODE_TAG }}.
 
-            **Planner → Backend → Frontend → QA — parallel agents, not one.**
+            **Planner → Backend → Frontend → QA — 4 agents, one command.**
 
             ### Downloads
 
             | Platform | File |
             |----------|------|
-            | macOS (Apple Silicon M1/M2/M3) | `orkestra-ide-*-darwin-arm64.dmg` |
-            | macOS (Intel) | `orkestra-ide-*-darwin-x64.dmg` |
-            | Windows 10/11 x64 | `orkestra-ide-*-windows-x64.zip` |
-            | Linux x64 (.tar.gz) | `orkestra-ide-*-linux-x64.tar.gz` |
-            | Linux x64 (.deb) | `orkestra-ide_*.deb` |
-            | Linux x64 (.rpm) | `orkestra-ide-*.rpm` |
+            | macOS (Apple Silicon M1/M2/M3) | `cesaflow-ide-*-darwin-arm64.dmg` |
+            | macOS (Intel) | `cesaflow-ide-*-darwin-x64.dmg` |
+            | Windows 10/11 x64 | `cesaflow-ide-*-windows-x64.zip` |
+            | Linux x64 (.tar.gz) | `cesaflow-ide-*-linux-x64.tar.gz` |
+            | Linux x64 (.deb) | `cesaflow-ide_*.deb` |
+            | Linux x64 (.rpm) | `cesaflow-ide-*.rpm` |
 
             ### Setup
             1. Download for your platform
-            2. Run Orkestra IDE
-            3. Open Settings → Extensions → Orkestra → enter your API key
+            2. Run CesaFlow IDE
+            3. Open Settings → Enter your API key from [cesaflow.ai](https://cesaflow.ai)
             4. Press `Ctrl+Shift+O` to start your first run
           files: |
             *.dmg
