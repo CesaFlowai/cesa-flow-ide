@@ -43,18 +43,7 @@
     "ariaKey": ""
   },
   "msftInternalDomains": [],
-  "builtInExtensions": [
-    {
-      "name": "cesaflow-ai.cesaflow",
-      "version": "1.0.0",
-      "repo": "https://github.com/CesaFlowai/cesa-flow-ide",
-      "metadata": {
-        "id": "cesaflow-built-in",
-        "publisherId": { "publisherId": "cesaflow-ai", "publisherName": "cesaflow-ai", "displayName": "CesaFlow AI", "flags": "" },
-        "publisherDisplayName": "CesaFlow AI"
-      }
-    }
-  ],
+  "builtInExtensions": [],
   "webEndpointUrlTemplate": "https://editor.cesaflow.ai/v--{{commit}}",
   "webviewContentExternalBaseUrlTemplate": "https://editor.cesaflow.ai/v--{{commit}}/out/vs/workbench/contrib/webview/browser/pre/",
   "crash-reporter": {
