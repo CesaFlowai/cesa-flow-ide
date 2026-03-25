@@ -14,6 +14,7 @@
   "win32ShellNameShort": "CesaFlow &IDE",
   "darwinBundleIdentifier": "ai.cesaflow.ide",
   "linuxIconName": "cesaflow-ide",
+  "licenseFileName": "LICENSE.txt",
   "licenseUrl": "https://github.com/CesaFlowai/cesa-flow-ide/blob/main/LICENSE.txt",
   "documentationUrl": "https://docs.cesaflow.ai",
   "releaseNotesUrl": "https://github.com/CesaFlowai/cesa-flow-ide/releases",
