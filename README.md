@@ -1,105 +1,138 @@
-# Orkestra IDE
+<p align="center">
+  <img src="icons/icon.png" alt="CesaFlow IDE" width="80" />
+</p>
 
-VS Code fork with native multi-agent AI orchestration.
+<h1 align="center">CesaFlow IDE</h1>
 
-**Cursor has Composer (1 agent). Orkestra IDE has Planner → Backend → Frontend → QA (parallel).**
+<p align="center">
+  <strong>The AI-native code editor. 4 agents. One command. Ship in minutes.</strong>
+</p>
+
+<p align="center">
+  <a href="https://cesaflow.ai">Website</a> ·
+  <a href="https://github.com/CesaFlowai/cesa-flow-ide/releases">Download</a> ·
+  <a href="https://docs.cesaflow.ai">Docs</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/VS%20Code-1.87.2-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey?style=flat-square" />
+  <img src="https://img.shields.io/badge/Telemetry-None-green?style=flat-square" />
+  <img src="https://img.shields.io/badge/License-MIT-purple?style=flat-square" />
+</p>
+
+---
+
+## Why CesaFlow IDE?
+
+Cursor gives you one agent. CesaFlow IDE gives you a full engineering team.
+
+| | VS Code | Cursor | **CesaFlow IDE** |
+|---|---|---|---|
+| Multi-agent pipeline | ✗ | ✗ | **Planner → Backend → Frontend → QA** |
+| Parallel execution | ✗ | ✗ | **✓ Backend + Frontend run simultaneously** |
+| Full codebase generation | ✗ | Single file | **✓ End-to-end, all files** |
+| Inline edit `Ctrl+K` | ✗ | ✓ | **✓** |
+| Context-aware chat `Ctrl+L` | ✗ | ✓ | **✓** |
+| Tab completion | ✗ | ✓ | **✓ via Groq / Cerebras** |
+| BYOM (your own API key) | ✗ | ✗ | **✓** |
+| Telemetry | ✓ | ? | **✗ Zero** |
+| Extension marketplace | MS Only | MS Only | **Open VSX** |
 
 ---
 
 ## How it works
 
-This repo does NOT contain VS Code source code. Instead:
+Describe a feature in plain English. CesaFlow IDE routes it through 4 specialized agents:
 
-1. GitHub Actions clones VS Code at a pinned tag (`1.87.2`)
-2. Replaces `product.json` with ours (branding, Open VSX, telemetry off)
-3. Copies the Orkestra built-in extension from `../vscode-extension/`
-4. Builds native binaries for all platforms
-5. Publishes to GitHub Releases
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Planner   │────▶│   Backend   │────▶│  Frontend   │────▶│     QA      │
+│ Architecture│     │  API + DB   │     │   UI + UX   │     │    Tests    │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+```
+
+All agents write real, runnable files directly into your workspace.
 
 ---
 
-## Release a new version
+## Download
 
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-GitHub Actions automatically builds and releases:
+Get the latest release from [Releases](https://github.com/CesaFlowai/cesa-flow-ide/releases):
 
 | Platform | File |
 |----------|------|
-| macOS Apple Silicon | `orkestra-ide-0.1.0-darwin-arm64.dmg` |
-| macOS Intel | `orkestra-ide-0.1.0-darwin-x64.dmg` |
-| Windows 10/11 | `orkestra-ide-0.1.0-windows-x64.zip` |
-| Linux | `orkestra-ide-0.1.0-linux-x64.tar.gz` + `.deb` + `.rpm` |
-
-Build time: ~20-30 min (npm cache hits reduce this to ~10 min on repeat builds).
+| macOS Apple Silicon (M1/M2/M3) | `cesaflow-ide-*-darwin-arm64.dmg` |
+| macOS Intel | `cesaflow-ide-*-darwin-x64.dmg` |
+| Windows 10/11 x64 | `cesaflow-ide-*-windows-x64.zip` |
+| Linux x64 | `cesaflow-ide-*-linux-x64.tar.gz` / `.deb` / `.rpm` |
 
 ---
 
-## Local build (macOS / Linux)
+## Quick Start
+
+1. Download CesaFlow IDE for your platform
+2. Open any project folder
+3. Get your API key from [cesaflow.ai](https://cesaflow.ai/dashboard/api-keys)
+4. `Ctrl+Shift+O` → describe what you want to build
+5. Watch 4 agents write your entire feature
+
+---
+
+## Build from Source
+
+This repo does **not** contain VS Code source — it clones it at build time.
+
+### GitHub Actions (recommended)
 
 ```bash
-bash scripts/build_local.sh          # uses VS Code 1.87.2
-bash scripts/build_local.sh 1.87.2 0.1.0
+git tag v1.0.0
+git push origin v1.0.0
+# Triggers multi-platform build → auto-publishes to Releases (~25 min)
 ```
 
-Requirements:
-- Node.js 20+, Git, Python 3
-- **Linux:** `sudo apt install build-essential libx11-dev libxkbfile-dev libsecret-1-dev`
-- **macOS:** Xcode CLT (`xcode-select --install`)
+### Local Build (macOS / Linux)
+
+```bash
+bash scripts/build_local.sh
+# Requirements: Node.js 20+, Git, Python 3
+# macOS: xcode-select --install
+# Linux: sudo apt install build-essential libx11-dev libxkbfile-dev libsecret-1-dev
+```
 
 ---
 
-## Repository layout
+## Repository Structure
 
 ```
-orkestra-ide/
+cesa-flow-ide/
 ├── product.json              ← Branding (replaces VS Code's product.json)
+├── extension/                ← Built-in CesaFlow extension (bundled at build)
+├── icons/                    ← App icons (all platforms)
 ├── scripts/
 │   ├── build_local.sh        ← Local build helper
-│   └── copy_extension.sh     ← Copies ../vscode-extension/ into VS Code tree
+│   └── copy_extension.sh     ← Injects extension into VS Code tree
 └── .github/
     └── workflows/
-        └── build.yml         ← Multi-platform CI/CD
+        └── build.yml         ← Multi-platform CI/CD (macOS + Windows + Linux)
 ```
-
-The Orkestra VS Code extension lives at `../vscode-extension/` and is automatically bundled.
-
----
-
-## What's different from VS Code / Cursor
-
-| Feature | VS Code | Cursor | **Orkestra IDE** |
-|---------|---------|--------|-----------------|
-| Multi-file agent | ✗ | Composer (1 agent) | **Planner→Backend→FE→QA** |
-| Parallel agents | ✗ | ✗ | **✓** |
-| BYOM (your API key) | ✗ | ✗ | **✓** |
-| Web search in agent | ✗ | ✗ | **✓** |
-| Self-debug loop | ✗ | ✗ | **✓** |
-| Telemetry | ✓ | ? | **✗ none** |
-| Extension marketplace | MS Only | MS Only | **Open VSX** |
-| Price | Free | $20/mo | **$0 (BYOM)** |
 
 ---
 
 ## Roadmap
 
-### Phase 1 ✅ (this repo)
-- [x] `product.json` branding (name, icon, Open VSX, telemetry=off)
-- [x] Built-in Orkestra extension bundled
-- [x] Multi-platform CI/CD (GitHub Actions)
-- [x] npm dependency caching (faster repeat builds)
-
-### Phase 2 (next)
-- [ ] Custom welcome screen (Orkestra onboarding)
-- [ ] Default dark theme "Orkestra Dark"
-- [ ] Cmd+K inline suggestions → Orkestra run
-- [ ] Cmd+L chat panel (context-aware with open files)
-- [ ] Tab completion via Groq/Cerebras (free, <100ms)
-
-### Phase 3
-- [ ] Code signing (macOS notarization, Windows EV cert)
+- [x] CesaFlow branding (product.json, Open VSX, telemetry off)
+- [x] Built-in extension bundled
+- [x] Multi-platform GitHub Actions CI/CD
+- [x] Inline edit (`Ctrl+K`), Chat (`Ctrl+L`), Tab completion
+- [ ] CesaFlow Dark theme (default)
+- [ ] macOS code signing + notarization
+- [ ] Windows EV certificate signing
 - [ ] Auto-update server
-- [ ] orkestra-ide.com download page
+- [ ] cesaflow.ai/download landing page
+
+---
+
+<p align="center">
+  Built with ⚡ by <a href="https://cesaflow.ai">CesaFlow AI</a>
+</p>
