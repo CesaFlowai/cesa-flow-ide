@@ -158,15 +158,12 @@ export class OrkestraApi {
       const wsUrl = this.serverUrl
         .replace('http://', 'ws://')
         .replace('https://', 'wss://');
-      // Use vscode's built-in fetch/WebSocket (available in extension host)
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const WS = require('ws');
-      const ws = new WS(`${wsUrl}/ws/runs?api_key=${this.apiKey}`);
-      ws.on('message', (raw: Buffer) => {
-        try { onMessage(JSON.parse(raw.toString())); } catch {}
-      });
-      ws.on('close', onClose);
-      ws.on('error', () => onClose());
+      const ws = new WebSocket(`${wsUrl}/ws/runs?api_key=${this.apiKey}`);
+      ws.onmessage = (ev: MessageEvent) => {
+        try { onMessage(JSON.parse(ev.data)); } catch {}
+      };
+      ws.onclose = onClose;
+      ws.onerror = () => onClose();
       return ws;
     } catch {
       return null;

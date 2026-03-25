@@ -58,6 +58,10 @@ jobs:
           sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
             product.json > vscode/product.json
 
+      - name: Compile extension TypeScript
+        working-directory: extension
+        run: npm install && npm run compile
+
       - name: Copy built-in extension
         run: bash scripts/copy_extension.sh
 
@@ -129,6 +133,10 @@ jobs:
           sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
             product.json > vscode/product.json
 
+      - name: Compile extension TypeScript
+        working-directory: extension
+        run: npm install && npm run compile
+
       - name: Copy built-in extension
         run: bash scripts/copy_extension.sh
 
@@ -194,6 +202,10 @@ jobs:
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
             product.json > vscode/product.json
+
+      - name: Compile extension TypeScript
+        working-directory: extension
+        run: npm install && npm run compile
 
       - name: Copy built-in extension
         shell: bash

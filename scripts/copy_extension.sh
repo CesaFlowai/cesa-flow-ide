@@ -26,8 +26,4 @@ if [ -d "$EXT_SRC/media" ]; then
   cp -r "$EXT_SRC/media" "$EXT_DST/"
 fi
 
-# Install runtime dependencies so VS Code build can find them
-echo "Installing extension runtime deps in $EXT_DST..."
-(cd "$EXT_DST" && npm install --production --no-package-lock --silent 2>/dev/null || true)
-
 echo "✓ CesaFlow extension copied to $EXT_DST"
