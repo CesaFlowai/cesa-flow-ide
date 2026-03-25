@@ -218,20 +218,41 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm install --legacy-peer-deps
 
+      - name: Add Inno Setup to PATH
+        shell: pwsh
+        run: |
+          $innoPath = "C:\Program Files (x86)\Inno Setup 6"
+          echo "$innoPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Build Windows x64
         working-directory: vscode
         run: npm run gulp vscode-win32-x64
 
-      - name: Create ZIP
+      - name: Build Windows x64 EXE installers
+        working-directory: vscode
+        run: |
+          npm run gulp vscode-win32-x64-system-setup
+          npm run gulp vscode-win32-x64-user-setup
+
+      - name: Collect Windows artifacts
         shell: pwsh
         run: |
+          # ZIP portable
           Compress-Archive -Path "VSCode-win32-x64\*" `
             -DestinationPath "cesaflow-ide-${{ env.CESAFLOW_VERSION }}-windows-x64.zip"
+          # Copy EXE installers with versioned names
+          $setups = Get-ChildItem -Path "vscode\.build\win32-x64" -Recurse -Filter "*.exe"
+          foreach ($f in $setups) {
+            $dest = "cesaflow-ide-${{ env.CESAFLOW_VERSION }}-$($f.Name)"
+            Copy-Item $f.FullName -Destination $dest
+          }
 
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: '*.zip'
+          path: |
+            *.zip
+            *.exe
           retention-days: 7
 
   # ── Release ────────────────────────────────────────────────────────────────
@@ -263,11 +284,12 @@ jobs:
             |----------|------|
             | macOS Apple Silicon (M1/M2/M3) | `cesaflow-ide-*-darwin-arm64.dmg` |
             | macOS Intel | `cesaflow-ide-*-darwin-x64.dmg` |
-            | Windows 10/11 x64 | `cesaflow-ide-*-windows-x64.zip` |
+            | Windows 10/11 x64 (Installer) | `cesaflow-ide-*-*-setup.exe` |
+            | Windows 10/11 x64 (Portable ZIP) | `cesaflow-ide-*-windows-x64.zip` |
             | Linux x64 (.tar.gz) | `cesaflow-ide-*-linux-x64.tar.gz` |
 
             ### Setup
-            1. Download for your platform
+            1. Download the installer for your platform
             2. Run CesaFlow IDE
             3. Get your API key from [cesaflow.ai](https://cesaflow.ai/dashboard/api-keys)
             4. Press `Ctrl+Shift+O` to start your first run
@@ -275,6 +297,7 @@ jobs:
             *.dmg
             *.zip
             *.tar.gz
+            *.exe
             **/*.deb
             **/*.rpm
           draft: false
