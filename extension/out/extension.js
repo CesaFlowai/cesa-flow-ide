@@ -85,10 +85,24 @@ function activate(context) {
     }), vscode.commands.registerCommand('orkestra.applyFiles', async (runId) => {
         await applyFilesToWorkspace(api, runId);
     }));
-    // ── Phase 2: Inline edit (Cmd+K), Chat (Cmd+L), Tab completion ──────────
+    // ── Phase 2: Inline edit (Cmd+K), Tab completion ────────────────────────
     (0, inline_1.registerInlineEdit)(context, api);
-    (0, inline_1.registerChatPanel)(context, api);
     (0, inline_1.registerTabCompletion)(context, api);
+    // ── Chat command (Cmd+L) — opens sidebar chat tab with file context ──────
+    context.subscriptions.push(vscode.commands.registerCommand('orkestra.chat', () => {
+        const editor = vscode.window.activeTextEditor;
+        let ctx = '';
+        if (editor) {
+            const sel = editor.selection;
+            const text = sel.isEmpty
+                ? editor.document.getText().slice(0, 6000)
+                : editor.document.getText(sel);
+            const filename = editor.document.fileName.split(/[\\/]/).pop();
+            const lang = editor.document.languageId;
+            ctx = `File: ${filename} (${lang})\n\`\`\`${lang}\n${text}\n\`\`\``;
+        }
+        panel.switchToChat(ctx);
+    }));
     // ── Welcome screen (first install) ──────────────────────────────────────
     (0, welcome_1.registerWelcome)(context);
     // ── Status bar ───────────────────────────────────────────────────────────

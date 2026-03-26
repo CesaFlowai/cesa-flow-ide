@@ -45,19 +45,19 @@ function showWelcome(context) {
     panel.webview.onDidReceiveMessage(async (msg) => {
         switch (msg.type) {
             case 'setApiKey':
-                await vscode.workspace.getConfiguration('cesaflow').update('apiKey', msg.key, true);
+                await vscode.workspace.getConfiguration('orkestra').update('apiKey', msg.key, true);
                 if (msg.url) {
-                    await vscode.workspace.getConfiguration('cesaflow').update('serverUrl', msg.url, true);
+                    await vscode.workspace.getConfiguration('orkestra').update('serverUrl', msg.url, true);
                 }
-                vscode.window.showInformationMessage('CesaFlow: Connected successfully!');
+                vscode.window.showInformationMessage('CesaFlow IDE: Connected successfully!');
                 panel.dispose();
-                vscode.commands.executeCommand('cesaflow.openPanel');
+                vscode.commands.executeCommand('orkestra.openPanel');
                 break;
             case 'openSettings':
-                vscode.commands.executeCommand('workbench.action.openSettings', 'cesaflow');
+                vscode.commands.executeCommand('workbench.action.openSettings', 'orkestra');
                 break;
             case 'openDashboard':
-                vscode.env.openExternal(vscode.Uri.parse(vscode.workspace.getConfiguration('cesaflow').get('serverUrl', 'http://localhost:8001').replace('8001', '3000') + '/dashboard'));
+                vscode.env.openExternal(vscode.Uri.parse(vscode.workspace.getConfiguration('orkestra').get('serverUrl', 'http://localhost:8001').replace('8001', '3000') + '/dashboard'));
                 break;
         }
     }, undefined, context.subscriptions);
@@ -69,7 +69,7 @@ function registerWelcome(context) {
         context.globalState.update(WELCOME_KEY, true);
         showWelcome(context);
     }
-    context.subscriptions.push(vscode.commands.registerCommand('cesaflow.welcome', () => showWelcome(context)));
+    context.subscriptions.push(vscode.commands.registerCommand('orkestra.welcome', () => showWelcome(context)));
 }
 function getWelcomeHtml(webview, context) {
     const jsUri = webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'media', 'welcome.js'));

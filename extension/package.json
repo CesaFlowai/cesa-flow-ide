@@ -1,6 +1,6 @@
 {
   "name": "orkestra",
-  "displayName": "Orkestra AI",
+  "displayName": "CesaFlow AI",
   "description": "Multi-agent AI coding assistant — Planner → Backend → Frontend → QA, right inside VS Code",
   "version": "0.1.0",
   "publisher": "orkestra-ai",
@@ -66,10 +66,10 @@
       }
     ],
     "viewsContainers": {
-      "activitybar": [
+      "secondarySidebar": [
         {
           "id": "orkestra",
-          "title": "Orkestra AI",
+          "title": "CesaFlow AI",
           "icon": "media/sidebar-icon.svg"
         }
       ]

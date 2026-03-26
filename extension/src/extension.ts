@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { OrkestraPanel, OrkestraViewProvider } from './panel';
 import { OrkestraApi } from './api';
 import { registerWelcome } from './welcome';
-import { registerInlineEdit, registerChatPanel, registerTabCompletion } from './inline';
+import { registerInlineEdit, registerTabCompletion } from './inline';
 
 export function activate(context: vscode.ExtensionContext) {
   const api = new OrkestraApi();
@@ -70,10 +70,27 @@ export function activate(context: vscode.ExtensionContext) {
     }),
   );
 
-  // ── Phase 2: Inline edit (Cmd+K), Chat (Cmd+L), Tab completion ──────────
+  // ── Phase 2: Inline edit (Cmd+K), Tab completion ────────────────────────
   registerInlineEdit(context, api);
-  registerChatPanel(context, api);
   registerTabCompletion(context, api);
+
+  // ── Chat command (Cmd+L) — opens sidebar chat tab with file context ──────
+  context.subscriptions.push(
+    vscode.commands.registerCommand('orkestra.chat', () => {
+      const editor = vscode.window.activeTextEditor;
+      let ctx = '';
+      if (editor) {
+        const sel = editor.selection;
+        const text = sel.isEmpty
+          ? editor.document.getText().slice(0, 6000)
+          : editor.document.getText(sel);
+        const filename = editor.document.fileName.split(/[\\/]/).pop();
+        const lang = editor.document.languageId;
+        ctx = `File: ${filename} (${lang})\n\`\`\`${lang}\n${text}\n\`\`\``;
+      }
+      panel.switchToChat(ctx);
+    })
+  );
 
   // ── Welcome screen (first install) ──────────────────────────────────────
   registerWelcome(context);
