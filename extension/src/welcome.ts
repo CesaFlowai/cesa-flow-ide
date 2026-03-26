@@ -16,20 +16,20 @@ export function showWelcome(context: vscode.ExtensionContext) {
   panel.webview.onDidReceiveMessage(async (msg) => {
     switch (msg.type) {
       case 'setApiKey':
-        await vscode.workspace.getConfiguration('cesaflow').update('apiKey', msg.key, true);
+        await vscode.workspace.getConfiguration('orkestra').update('apiKey', msg.key, true);
         if (msg.url) {
-          await vscode.workspace.getConfiguration('cesaflow').update('serverUrl', msg.url, true);
+          await vscode.workspace.getConfiguration('orkestra').update('serverUrl', msg.url, true);
         }
-        vscode.window.showInformationMessage('CesaFlow: Connected successfully!');
+        vscode.window.showInformationMessage('CesaFlow IDE: Connected successfully!');
         panel.dispose();
-        vscode.commands.executeCommand('cesaflow.openPanel');
+        vscode.commands.executeCommand('orkestra.openPanel');
         break;
       case 'openSettings':
-        vscode.commands.executeCommand('workbench.action.openSettings', 'cesaflow');
+        vscode.commands.executeCommand('workbench.action.openSettings', 'orkestra');
         break;
       case 'openDashboard':
         vscode.env.openExternal(vscode.Uri.parse(
-          vscode.workspace.getConfiguration('cesaflow').get('serverUrl', 'http://localhost:8001').replace('8001', '3000') + '/dashboard'
+          vscode.workspace.getConfiguration('orkestra').get('serverUrl', 'http://localhost:8001').replace('8001', '3000') + '/dashboard'
         ));
         break;
     }
@@ -37,7 +37,7 @@ export function showWelcome(context: vscode.ExtensionContext) {
 }
 
 export function registerWelcome(context: vscode.ExtensionContext) {
-  const WELCOME_KEY = 'cesaflow.welcomeSeen.v1';
+  const WELCOME_KEY = 'orkestra.welcomeSeen.v1';
   const hasSeenWelcome = context.globalState.get<boolean>(WELCOME_KEY);
   if (!hasSeenWelcome) {
     context.globalState.update(WELCOME_KEY, true);
@@ -45,7 +45,7 @@ export function registerWelcome(context: vscode.ExtensionContext) {
   }
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('cesaflow.welcome', () => showWelcome(context))
+    vscode.commands.registerCommand('orkestra.welcome', () => showWelcome(context))
   );
 }
 
