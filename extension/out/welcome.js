@@ -63,7 +63,7 @@ function showWelcome(context) {
     }, undefined, context.subscriptions);
 }
 function registerWelcome(context) {
-    const WELCOME_KEY = 'cesaflow.welcomeSeen.v1';
+    const WELCOME_KEY = 'cesaflow.welcomeSeen.v2';
     const hasSeenWelcome = context.globalState.get(WELCOME_KEY);
     if (!hasSeenWelcome) {
         context.globalState.update(WELCOME_KEY, true);

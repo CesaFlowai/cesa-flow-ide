@@ -437,8 +437,8 @@ class OrkestraPanel {
   <span class="header-plan" id="planBadge">free</span>
 </div>
 <div class="tabs">
-  <button class="tab active" id="tab-chat" onclick="switchTab('chat')">&#128172; Chat</button>
-  <button class="tab" id="tab-runs" onclick="switchTab('runs')">&#9889; Runs</button>
+  <button class="tab active" id="tab-chat" data-action="switchTab" data-tab="chat">&#128172; Chat</button>
+  <button class="tab" id="tab-runs" data-action="switchTab" data-tab="runs">&#9889; Runs</button>
 </div>
 
 <div class="tab-panel" id="chat-panel">
@@ -448,8 +448,8 @@ class OrkestraPanel {
   <div class="input-area">
     <textarea id="chatInput" placeholder="Ask a question or describe a task..." rows="3"></textarea>
     <div class="input-btns">
-      <button class="input-btn secondary" onclick="sendChat()">&#9658; Chat</button>
-      <button class="input-btn" onclick="sendAsRun()">&#9889; Run as Agent</button>
+      <button class="input-btn secondary" data-action="sendChat">&#9658; Chat</button>
+      <button class="input-btn" data-action="sendAsRun">&#9889; Run as Agent</button>
     </div>
   </div>
 </div>
