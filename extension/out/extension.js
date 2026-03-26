@@ -43,36 +43,31 @@ const inline_1 = require("./inline");
 function activate(context) {
     const api = new api_1.OrkestraApi();
     const panel = new panel_1.OrkestraPanel(context, api);
-    const provider = new panel_1.OrkestraViewProvider(context, panel);
-    // ── Sidebar panel ────────────────────────────────────────────────────────
-    context.subscriptions.push(vscode.window.registerWebviewViewProvider('orkestra.mainView', provider, {
-        webviewOptions: { retainContextWhenHidden: true },
-    }));
+    // Auto-open panel on the right after startup
+    setTimeout(() => panel.show(), 1500);
     // ── Core commands ────────────────────────────────────────────────────────
     context.subscriptions.push(vscode.commands.registerCommand('orkestra.newRun', async () => {
         const selection = getEditorSelection();
-        panel.show();
         panel.triggerNewRun(selection);
     }), vscode.commands.registerCommand('orkestra.openPanel', () => {
         panel.show();
     }), vscode.commands.registerCommand('orkestra.sendSelection', async () => {
         const selection = getEditorSelection();
         if (!selection) {
-            vscode.window.showWarningMessage('Orkestra: No text selected.');
+            vscode.window.showWarningMessage('CesaFlow: No text selected.');
             return;
         }
-        panel.show();
-        panel.triggerNewRun(selection);
+        panel.switchToChat(selection);
     }), vscode.commands.registerCommand('orkestra.configure', async () => {
         const key = await vscode.window.showInputBox({
-            prompt: 'Enter your Orkestra API key (sk_...)',
+            prompt: 'Enter your CesaFlow API key (sk_...)',
             password: true,
             placeHolder: 'sk_...',
             ignoreFocusOut: true,
         });
         if (key) {
             await vscode.workspace.getConfiguration('orkestra').update('apiKey', key, true);
-            vscode.window.showInformationMessage('Orkestra: API key saved ✓');
+            vscode.window.showInformationMessage('CesaFlow: API key saved ✓');
             panel.refresh();
         }
     }), vscode.commands.registerCommand('orkestra.refreshRuns', () => {
@@ -81,15 +76,10 @@ function activate(context) {
         await api.cancelRun(runId);
         panel.refresh();
     }), vscode.commands.registerCommand('orkestra.downloadRun', async (runId) => {
-        vscode.window.showInformationMessage(`Orkestra: Download run ${runId} from the dashboard.`);
+        vscode.window.showInformationMessage(`CesaFlow: Download run ${runId} from the dashboard.`);
     }), vscode.commands.registerCommand('orkestra.applyFiles', async (runId) => {
         await applyFilesToWorkspace(api, runId);
-    }));
-    // ── Phase 2: Inline edit (Cmd+K), Tab completion ────────────────────────
-    (0, inline_1.registerInlineEdit)(context, api);
-    (0, inline_1.registerTabCompletion)(context, api);
-    // ── Chat command (Cmd+L) — opens sidebar chat tab with file context ──────
-    context.subscriptions.push(vscode.commands.registerCommand('orkestra.chat', () => {
+    }), vscode.commands.registerCommand('orkestra.chat', () => {
         const editor = vscode.window.activeTextEditor;
         let ctx = '';
         if (editor) {
@@ -103,13 +93,16 @@ function activate(context) {
         }
         panel.switchToChat(ctx);
     }));
-    // ── Welcome screen (first install) ──────────────────────────────────────
+    // ── Phase 2: Inline edit, Tab completion ────────────────────────────────
+    (0, inline_1.registerInlineEdit)(context, api);
+    (0, inline_1.registerTabCompletion)(context, api);
+    // ── Welcome screen ───────────────────────────────────────────────────────
     (0, welcome_1.registerWelcome)(context);
     // ── Status bar ───────────────────────────────────────────────────────────
     const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     statusBar.command = 'orkestra.openPanel';
-    statusBar.text = '$(sparkle) Orkestra';
-    statusBar.tooltip = 'Open Orkestra AI Panel';
+    statusBar.text = '$(sparkle) CesaFlow';
+    statusBar.tooltip = 'Open CesaFlow AI Panel';
     statusBar.show();
     context.subscriptions.push(statusBar);
 }
@@ -128,13 +121,13 @@ function getEditorSelection() {
 async function applyFilesToWorkspace(api, runId) {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri;
     if (!workspaceFolder) {
-        vscode.window.showErrorMessage('Orkestra: No workspace folder open.');
+        vscode.window.showErrorMessage('CesaFlow: No workspace folder open.');
         return;
     }
     const confirm = await vscode.window.showWarningMessage('Apply all generated files to this workspace? Existing files will be overwritten.', { modal: true }, 'Apply');
     if (confirm !== 'Apply')
         return;
-    await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Orkestra: Applying files...', cancellable: false }, async (progress) => {
+    await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'CesaFlow: Applying files...', cancellable: false }, async (progress) => {
         try {
             const workspace = await api.getWorkspace(runId);
             const files = workspace.files || [];
@@ -149,14 +142,14 @@ async function applyFilesToWorkspace(api, runId) {
                 catch { }
                 await vscode.workspace.fs.writeFile(targetUri, Buffer.from(fileData.content, 'utf-8'));
             }
-            vscode.window.showInformationMessage(`Orkestra: ${files.length} files applied to workspace ✓`, 'Open Explorer').then(action => {
+            vscode.window.showInformationMessage(`CesaFlow: ${files.length} files applied to workspace ✓`, 'Open Explorer').then(action => {
                 if (action === 'Open Explorer') {
                     vscode.commands.executeCommand('workbench.view.explorer');
                 }
             });
         }
         catch (e) {
-            vscode.window.showErrorMessage(`Orkestra: Failed to apply files — ${e.message}`);
+            vscode.window.showErrorMessage(`CesaFlow: Failed to apply files — ${e.message}`);
         }
     });
 }

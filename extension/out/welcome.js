@@ -37,7 +37,7 @@ exports.showWelcome = showWelcome;
 exports.registerWelcome = registerWelcome;
 const vscode = __importStar(require("vscode"));
 function showWelcome(context) {
-    const panel = vscode.window.createWebviewPanel('cesaflow.welcome', 'Welcome to CesaFlow', vscode.ViewColumn.One, {
+    const panel = vscode.window.createWebviewPanel('cesaflow.welcome', 'Welcome to CesaFlow', vscode.ViewColumn.Active, {
         enableScripts: true,
         localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'media')],
     });
@@ -67,7 +67,7 @@ function registerWelcome(context) {
     const hasSeenWelcome = context.globalState.get(WELCOME_KEY);
     if (!hasSeenWelcome) {
         context.globalState.update(WELCOME_KEY, true);
-        showWelcome(context);
+        setTimeout(() => showWelcome(context), 500);
     }
     context.subscriptions.push(vscode.commands.registerCommand('orkestra.welcome', () => showWelcome(context)));
 }
