@@ -37,7 +37,7 @@ exports.showWelcome = showWelcome;
 exports.registerWelcome = registerWelcome;
 const vscode = __importStar(require("vscode"));
 function showWelcome(context) {
-    const panel = vscode.window.createWebviewPanel('cesaflow.welcome', 'Welcome to CesaFlow', vscode.ViewColumn.Active, {
+    const panel = vscode.window.createWebviewPanel('cesaflow.welcome', 'Welcome to CesaFlow', vscode.ViewColumn.One, {
         enableScripts: true,
         localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'media')],
     });

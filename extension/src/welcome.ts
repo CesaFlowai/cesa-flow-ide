@@ -4,7 +4,7 @@ export function showWelcome(context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
     'cesaflow.welcome',
     'Welcome to CesaFlow',
-    vscode.ViewColumn.Active,
+    vscode.ViewColumn.One,
     {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'media')],
