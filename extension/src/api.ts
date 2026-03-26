@@ -140,6 +140,7 @@ export class OrkestraApi {
   async chat(params: {
     message: string;
     context: string;
+    model?: string;
   }): Promise<{ reply: string; has_code: boolean; code?: string; language?: string }> {
     return this.request('POST', '/api/v1/inline/chat', params);
   }
