@@ -17,8 +17,11 @@ export class OrkestraPanel {
     _token: vscode.CancellationToken,
   ) {
     this._view = webviewView;
-    webviewView.webview.options = { enableScripts: true };
-    webviewView.webview.html = this._getHtml();
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')],
+    };
+    webviewView.webview.html = this._getHtml(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (msg) => {
       switch (msg.type) {
@@ -169,12 +172,21 @@ export class OrkestraPanel {
 
   // ── HTML ──────────────────────────────────────────────────────────────────
 
-  private _getHtml(): string {
+  private _getHtml(webview: vscode.Webview): string {
+    const jsUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.context.extensionUri, 'media', 'panel.js')
+    );
+    const csp = [
+      `default-src 'none'`,
+      `style-src 'unsafe-inline'`,
+      `script-src ${webview.cspSource}`,
+    ].join('; ');
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="${csp}">
   <title>Orkestra AI</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -389,295 +401,8 @@ export class OrkestraPanel {
   <div class="empty"><span class="spinner"></span> Loading...</div>
 </div>
 
-<script>
-  const vscode = acquireVsCodeApi();
-  let state = { runs: [], me: null, selectedRunId: null, activeRunId: null, streaming: [], selection: null };
+<script src="${jsUri}"></script>
 
-  // ── Message from extension host ─────────────────────────────────────────
-  window.addEventListener('message', ({ data }) => {
-    switch (data.type) {
-      case 'init':
-        state.runs = data.runs || [];
-        state.me = data.me;
-        state.serverUrl = data.serverUrl;
-        render();
-        break;
-      case 'notConfigured':
-        renderNotConfigured();
-        break;
-      case 'triggerNewRun':
-        state.selection = data.selection || null;
-        render();
-        setTimeout(() => document.getElementById('objective')?.focus(), 50);
-        break;
-      case 'runStarting':
-        state.streaming = [{ cls: 'dim', text: '⟳ Starting run...' }];
-        state.activeRunId = null;
-        render();
-        break;
-      case 'runStarted':
-        state.activeRunId = data.runId;
-        state.selectedRunId = data.runId;
-        state.streaming = [{ cls: 'ok', text: '✓ Run started: ' + data.runId.slice(0,8) + '...' }];
-        render();
-        break;
-      case 'runError':
-        state.streaming.push({ cls: 'err', text: '✗ ' + data.message });
-        renderStreaming();
-        break;
-      case 'runCancelled':
-        state.activeRunId = null;
-        state.streaming.push({ cls: 'dim', text: '⊘ Cancelled' });
-        renderStreaming();
-        break;
-      case 'wsEvent':
-        handleWsEvent(data.event);
-        break;
-      case 'wsDisconnected':
-        state.activeRunId = null;
-        break;
-      case 'runDetail':
-        state.runDetail = data.run;
-        state.runWorkspace = data.workspace;
-        render();
-        break;
-    }
-  });
-
-  function handleWsEvent(ev) {
-    const t = ev.type;
-    if (t === 'token_chunk') {
-      const last = state.streaming[state.streaming.length - 1];
-      if (last && last.streaming) {
-        last.text += ev.chunk || '';
-      } else {
-        state.streaming.push({ cls: 'agent', text: '[' + (ev.agent || '?') + '] ', streaming: true });
-        const l = state.streaming[state.streaming.length - 1];
-        l.text += ev.chunk || '';
-      }
-      renderStreaming();
-      return;
-    }
-    // Clear streaming flag on node complete
-    if (t === 'node_completed') {
-      const last = state.streaming[state.streaming.length - 1];
-      if (last && last.streaming) { last.streaming = false; state.streaming.push({ cls: 'dim', text: '' }); }
-    }
-    if (t === 'file_written') {
-      state.streaming.push({ cls: 'file', text: '📄 ' + ev.path });
-    } else if (t === 'node_started') {
-      state.streaming.push({ cls: 'agent', text: '▶ ' + (ev.agent || '') + ' agent starting...' });
-    } else if (t === 'run_completed') {
-      state.streaming.push({ cls: 'ok', text: '🎉 Run completed!' });
-      state.activeRunId = null;
-    } else if (t === 'run_failed') {
-      state.streaming.push({ cls: 'err', text: '✗ Run failed: ' + (ev.error || '') });
-      state.activeRunId = null;
-    } else if (t === 'command_output' && ev.line) {
-      state.streaming.push({ cls: ev.stderr ? 'err' : 'dim', text: '$ ' + ev.line });
-    }
-    renderStreaming();
-  }
-
-  // ── Renders ─────────────────────────────────────────────────────────────
-
-  function render() {
-    const content = document.getElementById('content');
-    const plan = state.me?.organization?.plan || 'free';
-    document.getElementById('planBadge').textContent = plan;
-
-    let html = '';
-
-    // New Run section
-    html += '<div class="section">';
-    html += '<div class="section-title">New Run</div>';
-    if (state.selection) {
-      html += '<div class="selection-badge">📎 Selection attached <button onclick="clearSelection()">✕</button></div>';
-    }
-    html += '<div class="run-form">';
-    html += '<textarea id="objective" class="run-input" placeholder="Describe your coding task..." rows="3" onkeydown="handleKeydown(event)"></textarea>';
-    html += '<button class="run-btn" onclick="startRun()" id="runBtn">▶ Start Run</button>';
-    html += '</div>';
-    html += '</div>';
-
-    // Streaming output
-    if (state.streaming.length > 0) {
-      html += '<hr class="divider">';
-      html += renderStreamingHtml();
-    }
-
-    // Selected run detail
-    if (state.selectedRunId && state.runDetail) {
-      html += '<hr class="divider">';
-      html += renderDetailHtml();
-    }
-
-    // Runs list
-    html += '<hr class="divider">';
-    html += '<div class="section">';
-    html += '<div class="section-title">Recent Runs</div>';
-    if (state.runs.length === 0) {
-      html += '<div class="empty">No runs yet</div>';
-    } else {
-      state.runs.forEach(run => {
-        const obj = (run.task_objective || run.objective || 'Untitled').slice(0, 48);
-        const status = run.status || 'pending';
-        const isSelected = run.run_id === state.selectedRunId;
-        html += '<div class="run-item' + (isSelected ? ' active' : '') + '" onclick="selectRun(\'' + run.run_id + '\')">';
-        html += '<div class="run-dot ' + status + '"></div>';
-        html += '<span class="run-obj">' + escHtml(obj) + '</span>';
-        html += '<span class="run-status">' + status + '</span>';
-        html += '</div>';
-      });
-    }
-    html += '</div>';
-
-    content.innerHTML = html;
-
-    // If there's a selection, fill it in objective
-    if (state.selection) {
-      const ta = document.getElementById('objective');
-      if (ta && !ta.value) ta.value = state.selection;
-    }
-
-    // Scroll stream to bottom
-    scrollStream();
-  }
-
-  function renderStreamingHtml() {
-    let html = '<div class="section"><div class="section-title">Output</div>';
-    html += '<div class="stream-box" id="streamBox">';
-    state.streaming.slice(-80).forEach(line => {
-      html += '<div class="stream-line ' + line.cls + '">' + escHtml(line.text) + '</div>';
-    });
-    html += '</div></div>';
-    return html;
-  }
-
-  function renderStreaming() {
-    const box = document.getElementById('streamBox');
-    if (!box) { render(); return; }
-    box.innerHTML = state.streaming.slice(-80).map(line =>
-      '<div class="stream-line ' + line.cls + '">' + escHtml(line.text) + '</div>'
-    ).join('');
-    scrollStream();
-  }
-
-  function renderDetailHtml() {
-    const run = state.runDetail;
-    if (!run) return '';
-    const ws = state.runWorkspace;
-    const files = ws?.files || [];
-    const isRunning = run.status === 'running' || run.status === 'pending';
-
-    let html = '<div class="section"><div class="section-title">Run Detail</div><div class="detail">';
-    html += '<div class="detail-title">' + escHtml((run.task_objective || '').slice(0, 60)) + '</div>';
-
-    // Agent rows
-    (run.nodes || []).forEach(node => {
-      const dotColor = node.status === 'completed' ? '#4ec994' : node.status === 'failed' ? '#f48771' : node.status === 'running' ? '#7c9ef8' : '#888';
-      html += '<div class="agent-row">';
-      html += '<div class="agent-dot" style="background:' + dotColor + '"></div>';
-      html += '<span>' + escHtml(node.agent_name) + '</span>';
-      html += '<span style="margin-left:auto;font-size:10px;opacity:0.6">' + node.status + '</span>';
-      html += '</div>';
-    });
-
-    // Files
-    if (files.length > 0) {
-      html += '<div class="file-list">';
-      files.slice(0, 10).forEach(f => {
-        html += '<span class="file-chip">' + escHtml(f) + '</span>';
-      });
-      if (files.length > 10) html += '<span class="file-chip">+' + (files.length - 10) + ' more</span>';
-      html += '</div>';
-    }
-
-    // Actions
-    html += '<div class="detail-actions">';
-    if (isRunning) {
-      html += '<button class="btn-sm danger" onclick="cancelRun(\'' + run.run_id + '\')">■ Cancel</button>';
-    } else {
-      if (files.length > 0) {
-        html += '<button class="btn-sm primary" onclick="applyFiles(\'' + run.run_id + '\')">⬇ Apply Files</button>';
-      }
-      html += '<button class="btn-sm" onclick="openInBrowser(\'' + run.run_id + '\')">↗ Open in Browser</button>';
-    }
-    html += '</div>';
-
-    html += '</div></div>';
-    return html;
-  }
-
-  function renderNotConfigured() {
-    const content = document.getElementById('content');
-    content.innerHTML = '<div class="setup">' +
-      '<p>Set your Orkestra API key to get started.</p>' +
-      '<button class="run-btn" onclick="configure()">⚙ Configure API Key</button>' +
-      '</div>';
-  }
-
-  // ── Actions ──────────────────────────────────────────────────────────────
-
-  function startRun() {
-    const ta = document.getElementById('objective');
-    const obj = ta.value.trim();
-    if (!obj) return;
-    let fullObj = obj;
-    if (state.selection && !obj.includes(state.selection)) {
-      fullObj = obj + '\n\nContext:\n' + state.selection;
-    }
-    state.streaming = [];
-    ta.value = '';
-    vscode.postMessage({ type: 'startRun', objective: fullObj });
-  }
-
-  function handleKeydown(e) {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); startRun(); }
-  }
-
-  function selectRun(runId) {
-    state.selectedRunId = runId;
-    state.runDetail = null;
-    state.runWorkspace = null;
-    render();
-    vscode.postMessage({ type: 'selectRun', runId });
-  }
-
-  function cancelRun(runId) {
-    vscode.postMessage({ type: 'cancelRun', runId });
-  }
-
-  function applyFiles(runId) {
-    vscode.postMessage({ type: 'applyFiles', runId });
-  }
-
-  function openInBrowser(runId) {
-    const base = state.serverUrl ? state.serverUrl.replace(':8001', ':3000') : 'http://localhost:3000';
-    vscode.postMessage({ type: 'openBrowser', url: base + '/dashboard/runs/' + runId });
-  }
-
-  function clearSelection() {
-    state.selection = null;
-    render();
-  }
-
-  function configure() {
-    vscode.postMessage({ type: 'configure' });
-  }
-
-  function scrollStream() {
-    const box = document.getElementById('streamBox');
-    if (box) box.scrollTop = box.scrollHeight;
-  }
-
-  function escHtml(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  // Bootstrap
-  vscode.postMessage({ type: 'ready' });
-</script>
 </body>
 </html>`;
   }
