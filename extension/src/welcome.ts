@@ -37,7 +37,8 @@ export function showWelcome(context: vscode.ExtensionContext) {
 }
 
 export function registerWelcome(context: vscode.ExtensionContext) {
-  const WELCOME_KEY = 'cesaflow.welcomeSeen.v2';
+  const version = context.extension.packageJSON.version as string;
+  const WELCOME_KEY = `cesaflow.welcomeSeen.${version}`;
   const hasSeenWelcome = context.globalState.get<boolean>(WELCOME_KEY);
   if (!hasSeenWelcome) {
     context.globalState.update(WELCOME_KEY, true);

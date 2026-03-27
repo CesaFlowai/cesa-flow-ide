@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { OrkestraPanel } from './panel';
 import { OrkestraApi } from './api';
 import { registerWelcome } from './welcome';
+import { registerSettings } from './settings';
 import { registerInlineEdit, registerTabCompletion } from './inline';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -85,6 +86,9 @@ export function activate(context: vscode.ExtensionContext) {
   // ── Welcome screen ───────────────────────────────────────────────────────
   registerWelcome(context);
 
+  // ── Settings panel ───────────────────────────────────────────────────────
+  registerSettings(context);
+
   // ── Status bar ───────────────────────────────────────────────────────────
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   statusBar.command = 'orkestra.openPanel';
@@ -92,6 +96,13 @@ export function activate(context: vscode.ExtensionContext) {
   statusBar.tooltip = 'Open CesaFlow AI Panel';
   statusBar.show();
   context.subscriptions.push(statusBar);
+
+  const settingsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
+  settingsBar.command = 'orkestra.settings';
+  settingsBar.text = '$(settings-gear)';
+  settingsBar.tooltip = 'CesaFlow Settings';
+  settingsBar.show();
+  context.subscriptions.push(settingsBar);
 }
 
 function getEditorSelection(): string | undefined {

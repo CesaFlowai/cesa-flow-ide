@@ -2,7 +2,7 @@
   "name": "orkestra",
   "displayName": "CesaFlow AI",
   "description": "Multi-agent AI coding assistant — Planner → Backend → Frontend → QA, right inside VS Code",
-  "version": "0.2.4",
+  "version": "0.2.7",
   "publisher": "orkestra-ai",
   "engines": {
     "vscode": "^1.85.0"
@@ -62,7 +62,12 @@
       },
       {
         "command": "orkestra.welcome",
-        "title": "Orkestra: Welcome / Get Started"
+        "title": "CesaFlow: Welcome / Get Started"
+      },
+      {
+        "command": "orkestra.settings",
+        "title": "CesaFlow: Settings",
+        "icon": "$(settings-gear)"
       }
     ],
     "keybindings": [
@@ -104,22 +109,22 @@
       ]
     },
     "configuration": {
-      "title": "Orkestra",
+      "title": "CesaFlow",
       "properties": {
         "orkestra.apiKey": {
           "type": "string",
           "default": "",
-          "description": "Your Orkestra API key (sk_...)"
+          "description": "CesaFlow AI API key (Groq, OpenAI, Anthropic, Gemini, OpenRouter...)"
         },
         "orkestra.serverUrl": {
           "type": "string",
           "default": "http://localhost:8001",
-          "description": "Orkestra backend URL"
+          "description": "CesaFlow backend URL (kendi sunucun için)"
         },
         "orkestra.autoApplyFiles": {
           "type": "boolean",
           "default": false,
-          "description": "Automatically apply generated files to workspace when run completes"
+          "description": "Run tamamlandığında dosyaları workspace'e otomatik uygula"
         }
       }
     }
