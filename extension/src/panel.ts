@@ -55,7 +55,10 @@ export class OrkestraPanel {
           await vscode.commands.executeCommand('orkestra.applyFiles', msg.runId);
           break;
         case 'configure':
-          await vscode.commands.executeCommand('orkestra.configure');
+          await vscode.commands.executeCommand('orkestra.settings');
+          break;
+        case 'openSettings':
+          await vscode.commands.executeCommand('orkestra.settings');
           break;
         case 'refresh':
           await this._sendInitialData();
@@ -420,6 +423,7 @@ export class OrkestraPanel {
   </svg>
   <span class="header-title">CesaFlow AI</span>
   <span class="header-plan" id="planBadge">free</span>
+  <button style="background:none;border:none;cursor:pointer;opacity:0.6;padding:2px 4px;color:inherit;font-size:14px" title="CesaFlow Settings" data-action="openSettings">&#9881;</button>
 </div>
 <div class="tabs">
   <button class="tab active" id="tab-chat" data-action="switchTab" data-tab="chat">&#128172; Chat</button>

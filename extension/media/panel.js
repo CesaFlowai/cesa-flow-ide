@@ -25,6 +25,7 @@
       case 'applyFiles': applyFiles(el.dataset.id); break;
       case 'openBrowser': openInBrowser(el.dataset.id); break;
       case 'configure': configure(); break;
+      case 'openSettings': vscode.postMessage({ type: 'openSettings' }); break;
       case 'copyCode': copyCode(parseInt(el.dataset.idx)); break;
       case 'insertCode': insertCode(parseInt(el.dataset.idx)); break;
     }
