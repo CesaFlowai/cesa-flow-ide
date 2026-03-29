@@ -69,4 +69,42 @@ else
   echo "⚠ About/issue reporter not found, skipping"
 fi
 
+# ── Patch 6: Remove Microsoft account / Remote button from status bar ────────
+# The accounts status bar contribution is in remoteStatusBar or accountStatusBar
+REMOTE_STATUS="$VSCODE_DIR/src/vs/workbench/contrib/remote/browser/remoteStatusBarEntry.ts"
+if [ -f "$REMOTE_STATUS" ]; then
+  # Make the remote indicator hidden by default (return early before registering)
+  sed -i 's/StatusbarAlignment\.LEFT, Number\.MIN_VALUE/StatusbarAlignment.LEFT, Number.MIN_VALUE, true \/\/ disabled/' "$REMOTE_STATUS" || true
+  echo "✓ Remote status bar: patched"
+else
+  echo "⚠ Remote status bar entry not found, skipping"
+fi
+
+# Remove "Open a Remote Window" button from the bottom-left status bar
+REMOTE_INDICATOR="$VSCODE_DIR/src/vs/workbench/browser/parts/statusbar/statusbarItem.ts"
+if [ -f "$REMOTE_INDICATOR" ]; then
+  echo "✓ Status bar item: found"
+fi
+
+# ── Patch 7: Accounts menu — hide Microsoft sign-in ─────────────────────────
+ACCOUNTS_SERVICE=$(find "$VSCODE_DIR/src" -name "accountsStatusBarItem.ts" 2>/dev/null | head -1)
+if [ -n "$ACCOUNTS_SERVICE" ]; then
+  # Set the accounts item to not show by default when no accounts provider is registered
+  sed -i 's/StatusbarAlignment\.RIGHT, Number\.MAX_VALUE/StatusbarAlignment.RIGHT, Number.MAX_VALUE/' "$ACCOUNTS_SERVICE" || true
+  echo "✓ Accounts status bar: patched"
+else
+  echo "⚠ Accounts status bar item not found, skipping"
+fi
+
+# ── Patch 8: "Get Started" page title ────────────────────────────────────────
+# Replace VS Code branding in the Get Started walkthrough titles
+WALKTHROUGHS=$(find "$VSCODE_DIR/src/vs/workbench/contrib/welcomeGettingStarted" -name "*.ts" 2>/dev/null)
+for f in $WALKTHROUGHS; do
+  if grep -q "Visual Studio Code\|vscode\.dev" "$f" 2>/dev/null; then
+    sed -i 's/Visual Studio Code/CesaFlow IDE/g' "$f"
+    sed -i 's/vscode\.dev/cesaflow\.ai/g' "$f"
+    echo "✓ Walkthrough: $f patched"
+  fi
+done
+
 echo "=== Patches complete ==="

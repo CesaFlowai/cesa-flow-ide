@@ -2,7 +2,7 @@
   "name": "orkestra",
   "displayName": "CesaFlow AI",
   "description": "Multi-agent AI coding assistant — Planner → Backend → Frontend → QA, right inside VS Code",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "orkestra-ai",
   "engines": {
     "vscode": "^1.85.0"
@@ -31,6 +31,16 @@
           "name": "CesaFlow AI"
         }
       ]
+    },
+    "themes": [
+      {
+        "label": "CesaFlow Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/cesaflow-dark.json"
+      }
+    ],
+    "configurationDefaults": {
+      "workbench.colorTheme": "CesaFlow Dark"
     },
     "commands": [
       {

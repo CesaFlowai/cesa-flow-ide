@@ -46,6 +46,15 @@ function activate(context) {
     const panel = new panel_1.OrkestraPanel(context, api);
     // Register as native sidebar panel (Activity Bar)
     context.subscriptions.push(vscode.window.registerWebviewViewProvider(panel_1.OrkestraPanel.viewType, panel, { webviewOptions: { retainContextWhenHidden: true } }));
+    // Auto-open sidebar on first launch of each new version
+    const version = context.extension.packageJSON.version;
+    const sidebarOpenKey = `cesaflow.sidebarOpened.${version}`;
+    if (!context.globalState.get(sidebarOpenKey)) {
+        context.globalState.update(sidebarOpenKey, true);
+        setTimeout(() => {
+            vscode.commands.executeCommand('workbench.view.extension.cesaflow');
+        }, 800);
+    }
     // ── Core commands ────────────────────────────────────────────────────────
     context.subscriptions.push(vscode.commands.registerCommand('orkestra.newRun', async () => {
         const selection = getEditorSelection();
@@ -103,11 +112,26 @@ function activate(context) {
     (0, settings_1.registerSettings)(context);
     // ── Status bar ───────────────────────────────────────────────────────────
     const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    statusBar.command = 'orkestra.openPanel';
-    statusBar.text = '$(sparkle) CesaFlow';
+    statusBar.command = 'workbench.view.extension.cesaflow';
     statusBar.tooltip = 'Open CesaFlow AI Panel';
     statusBar.show();
     context.subscriptions.push(statusBar);
+    function updateStatusBar() {
+        if (api.isConfigured) {
+            statusBar.text = '$(sparkle) CesaFlow';
+            statusBar.color = undefined;
+        }
+        else {
+            statusBar.text = '$(warning) CesaFlow: setup required';
+            statusBar.color = new vscode.ThemeColor('statusBarItem.warningForeground');
+        }
+    }
+    updateStatusBar();
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((e) => {
+        if (e.affectsConfiguration('orkestra')) {
+            updateStatusBar();
+        }
+    }));
     const settingsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
     settingsBar.command = 'orkestra.settings';
     settingsBar.text = '$(settings-gear)';

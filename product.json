@@ -77,7 +77,7 @@
     "editor.minimap.enabled": false,
     "editor.scrollBeyondLastLine": false,
     "editor.suggest.preview": true,
-    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.colorTheme": "CesaFlow Dark",
     "workbench.startupEditor": "none",
     "workbench.tree.indent": 16,
     "workbench.enableExperiments": false,
