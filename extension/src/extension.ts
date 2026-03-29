@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
     }),
 
     vscode.commands.registerCommand('orkestra.openPanel', () => {
-      panel.show();
+      vscode.commands.executeCommand('workbench.view.extension.cesaflow');
     }),
 
     vscode.commands.registerCommand('orkestra.sendSelection', async () => {

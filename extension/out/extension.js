@@ -60,7 +60,7 @@ function activate(context) {
         const selection = getEditorSelection();
         panel.triggerNewRun(selection);
     }), vscode.commands.registerCommand('orkestra.openPanel', () => {
-        panel.show();
+        vscode.commands.executeCommand('workbench.view.extension.cesaflow');
     }), vscode.commands.registerCommand('orkestra.sendSelection', async () => {
         const selection = getEditorSelection();
         if (!selection) {
