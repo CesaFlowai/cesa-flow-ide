@@ -9,8 +9,14 @@ export function activate(context: vscode.ExtensionContext) {
   const api = new OrkestraApi();
   const panel = new OrkestraPanel(context, api);
 
-  // Auto-open panel on the right after startup
-  setTimeout(() => panel.show(), 1500);
+  // Register as native sidebar panel (Activity Bar)
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      OrkestraPanel.viewType,
+      panel,
+      { webviewOptions: { retainContextWhenHidden: true } }
+    )
+  );
 
   // ── Core commands ────────────────────────────────────────────────────────
   context.subscriptions.push(

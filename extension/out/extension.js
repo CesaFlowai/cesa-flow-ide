@@ -39,12 +39,13 @@ const vscode = __importStar(require("vscode"));
 const panel_1 = require("./panel");
 const api_1 = require("./api");
 const welcome_1 = require("./welcome");
+const settings_1 = require("./settings");
 const inline_1 = require("./inline");
 function activate(context) {
     const api = new api_1.OrkestraApi();
     const panel = new panel_1.OrkestraPanel(context, api);
-    // Auto-open panel on the right after startup
-    setTimeout(() => panel.show(), 1500);
+    // Register as native sidebar panel (Activity Bar)
+    context.subscriptions.push(vscode.window.registerWebviewViewProvider(panel_1.OrkestraPanel.viewType, panel, { webviewOptions: { retainContextWhenHidden: true } }));
     // ── Core commands ────────────────────────────────────────────────────────
     context.subscriptions.push(vscode.commands.registerCommand('orkestra.newRun', async () => {
         const selection = getEditorSelection();
@@ -98,6 +99,8 @@ function activate(context) {
     (0, inline_1.registerTabCompletion)(context, api);
     // ── Welcome screen ───────────────────────────────────────────────────────
     (0, welcome_1.registerWelcome)(context);
+    // ── Settings panel ───────────────────────────────────────────────────────
+    (0, settings_1.registerSettings)(context);
     // ── Status bar ───────────────────────────────────────────────────────────
     const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     statusBar.command = 'orkestra.openPanel';
@@ -105,6 +108,12 @@ function activate(context) {
     statusBar.tooltip = 'Open CesaFlow AI Panel';
     statusBar.show();
     context.subscriptions.push(statusBar);
+    const settingsBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
+    settingsBar.command = 'orkestra.settings';
+    settingsBar.text = '$(settings-gear)';
+    settingsBar.tooltip = 'CesaFlow Settings';
+    settingsBar.show();
+    context.subscriptions.push(settingsBar);
 }
 function getEditorSelection() {
     const editor = vscode.window.activeTextEditor;

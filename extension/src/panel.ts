@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
-import { OrkestraApi, Run } from './api';
+import { OrkestraApi } from './api';
 
-export class OrkestraPanel {
-  private static _panel: vscode.WebviewPanel | undefined;
+export class OrkestraPanel implements vscode.WebviewViewProvider {
+  public static readonly viewType = 'cesaflow.sidebar';
+
+  private _view?: vscode.WebviewView;
   private _ws: any = null;
   private _activeRunId: string | null = null;
 
@@ -11,30 +13,22 @@ export class OrkestraPanel {
     private readonly api: OrkestraApi,
   ) {}
 
-  show() {
-    if (OrkestraPanel._panel) {
-      OrkestraPanel._panel.reveal(vscode.ViewColumn.Two, false);
-      return;
-    }
-    this._createPanel();
-  }
+  // Called by VS Code when the sidebar view becomes visible for the first time
+  resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    _context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken,
+  ) {
+    this._view = webviewView;
 
-  private _createPanel() {
-    const panel = vscode.window.createWebviewPanel(
-      'cesaflow.main',
-      'CesaFlow AI',
-      { viewColumn: vscode.ViewColumn.Two, preserveFocus: true },
-      {
-        enableScripts: true,
-        retainContextWhenHidden: true,
-        localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')],
-      }
-    );
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')],
+    };
 
-    OrkestraPanel._panel = panel;
-    panel.webview.html = this._getHtml(panel.webview);
+    webviewView.webview.html = this._getHtml(webviewView.webview);
 
-    panel.webview.onDidReceiveMessage(async (msg) => {
+    webviewView.webview.onDidReceiveMessage(async (msg) => {
       switch (msg.type) {
         case 'ready':
           await this._sendInitialData();
@@ -75,27 +69,34 @@ export class OrkestraPanel {
       }
     });
 
-    panel.onDidDispose(() => {
+    webviewView.onDidDispose(() => {
       if (this._ws) {
         try { this._ws.close(); } catch {}
         this._ws = null;
       }
-      OrkestraPanel._panel = undefined;
+      this._view = undefined;
     });
+
+    // Load data immediately when view resolves
+    this._sendInitialData();
+  }
+
+  show() {
+    vscode.commands.executeCommand('workbench.view.extension.cesaflow');
   }
 
   switchToChat(context?: string) {
     this.show();
     setTimeout(() => {
-      OrkestraPanel._panel?.webview.postMessage({ type: 'switchToChat', context });
-    }, 200);
+      this._post({ type: 'switchToChat', context });
+    }, 400);
   }
 
   triggerNewRun(selection?: string) {
     this.show();
     setTimeout(() => {
-      OrkestraPanel._panel?.webview.postMessage({ type: 'triggerNewRun', selection });
-    }, 200);
+      this._post({ type: 'triggerNewRun', selection });
+    }, 400);
   }
 
   refresh() {
@@ -217,7 +218,7 @@ export class OrkestraPanel {
   }
 
   private _post(message: object) {
-    OrkestraPanel._panel?.webview.postMessage(message);
+    this._view?.webview.postMessage(message);
   }
 
   private _getHtml(webview: vscode.Webview): string {
@@ -243,7 +244,7 @@ export class OrkestraPanel {
       font-family: var(--vscode-font-family);
       font-size: var(--vscode-font-size);
       color: var(--vscode-foreground);
-      background: var(--vscode-editor-background);
+      background: var(--vscode-sideBar-background, var(--vscode-editor-background));
       height: 100vh; display: flex; flex-direction: column; overflow: hidden;
     }
     .header {

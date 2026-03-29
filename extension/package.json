@@ -2,7 +2,7 @@
   "name": "orkestra",
   "displayName": "CesaFlow AI",
   "description": "Multi-agent AI coding assistant — Planner → Backend → Frontend → QA, right inside VS Code",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "publisher": "orkestra-ai",
   "engines": {
     "vscode": "^1.85.0"
@@ -14,6 +14,24 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cesaflow",
+          "title": "CesaFlow AI",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "cesaflow": [
+        {
+          "type": "webview",
+          "id": "cesaflow.sidebar",
+          "name": "CesaFlow AI"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "orkestra.newRun",

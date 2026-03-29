@@ -58,6 +58,9 @@ jobs:
           sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
             product.json > vscode/product.json
 
+      - name: Apply source patches
+        run: bash scripts/apply_patches.sh vscode
+
       - name: Compile extension TypeScript
         working-directory: extension
         run: npm install && npm run compile
@@ -133,6 +136,9 @@ jobs:
           sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
             product.json > vscode/product.json
 
+      - name: Apply source patches
+        run: bash scripts/apply_patches.sh vscode
+
       - name: Compile extension TypeScript
         working-directory: extension
         run: npm install && npm run compile
@@ -202,6 +208,10 @@ jobs:
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           sed "s/REPLACE_WITH_COMMIT/${COMMIT}/g; s/REPLACE_WITH_DATE/${DATE}/g" \
             product.json > vscode/product.json
+
+      - name: Apply source patches
+        shell: bash
+        run: bash scripts/apply_patches.sh vscode
 
       - name: Compile extension TypeScript
         working-directory: extension

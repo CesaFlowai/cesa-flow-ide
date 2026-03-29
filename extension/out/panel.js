@@ -42,22 +42,15 @@ class OrkestraPanel {
         this._ws = null;
         this._activeRunId = null;
     }
-    show() {
-        if (OrkestraPanel._panel) {
-            OrkestraPanel._panel.reveal(vscode.ViewColumn.Two, false);
-            return;
-        }
-        this._createPanel();
-    }
-    _createPanel() {
-        const panel = vscode.window.createWebviewPanel('cesaflow.main', 'CesaFlow AI', { viewColumn: vscode.ViewColumn.Two, preserveFocus: true }, {
+    // Called by VS Code when the sidebar view becomes visible for the first time
+    resolveWebviewView(webviewView, _context, _token) {
+        this._view = webviewView;
+        webviewView.webview.options = {
             enableScripts: true,
-            retainContextWhenHidden: true,
             localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')],
-        });
-        OrkestraPanel._panel = panel;
-        panel.webview.html = this._getHtml(panel.webview);
-        panel.webview.onDidReceiveMessage(async (msg) => {
+        };
+        webviewView.webview.html = this._getHtml(webviewView.webview);
+        webviewView.webview.onDidReceiveMessage(async (msg) => {
             switch (msg.type) {
                 case 'ready':
                     await this._sendInitialData();
@@ -78,7 +71,10 @@ class OrkestraPanel {
                     await vscode.commands.executeCommand('orkestra.applyFiles', msg.runId);
                     break;
                 case 'configure':
-                    await vscode.commands.executeCommand('orkestra.configure');
+                    await vscode.commands.executeCommand('orkestra.settings');
+                    break;
+                case 'openSettings':
+                    await vscode.commands.executeCommand('orkestra.settings');
                     break;
                 case 'refresh':
                     await this._sendInitialData();
@@ -94,7 +90,7 @@ class OrkestraPanel {
                     break;
             }
         });
-        panel.onDidDispose(() => {
+        webviewView.onDidDispose(() => {
             if (this._ws) {
                 try {
                     this._ws.close();
@@ -102,20 +98,25 @@ class OrkestraPanel {
                 catch { }
                 this._ws = null;
             }
-            OrkestraPanel._panel = undefined;
+            this._view = undefined;
         });
+        // Load data immediately when view resolves
+        this._sendInitialData();
+    }
+    show() {
+        vscode.commands.executeCommand('workbench.view.extension.cesaflow');
     }
     switchToChat(context) {
         this.show();
         setTimeout(() => {
-            OrkestraPanel._panel?.webview.postMessage({ type: 'switchToChat', context });
-        }, 200);
+            this._post({ type: 'switchToChat', context });
+        }, 400);
     }
     triggerNewRun(selection) {
         this.show();
         setTimeout(() => {
-            OrkestraPanel._panel?.webview.postMessage({ type: 'triggerNewRun', selection });
-        }, 200);
+            this._post({ type: 'triggerNewRun', selection });
+        }, 400);
     }
     refresh() {
         this._sendInitialData();
@@ -233,7 +234,7 @@ class OrkestraPanel {
         editor.edit((eb) => eb.replace(editor.selection, code));
     }
     _post(message) {
-        OrkestraPanel._panel?.webview.postMessage(message);
+        this._view?.webview.postMessage(message);
     }
     _getHtml(webview) {
         const jsUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'panel.js'));
@@ -255,7 +256,7 @@ class OrkestraPanel {
       font-family: var(--vscode-font-family);
       font-size: var(--vscode-font-size);
       color: var(--vscode-foreground);
-      background: var(--vscode-editor-background);
+      background: var(--vscode-sideBar-background, var(--vscode-editor-background));
       height: 100vh; display: flex; flex-direction: column; overflow: hidden;
     }
     .header {
@@ -435,6 +436,7 @@ class OrkestraPanel {
   </svg>
   <span class="header-title">CesaFlow AI</span>
   <span class="header-plan" id="planBadge">free</span>
+  <button style="background:none;border:none;cursor:pointer;opacity:0.6;padding:2px 4px;color:inherit;font-size:14px" title="CesaFlow Settings" data-action="openSettings">&#9881;</button>
 </div>
 <div class="tabs">
   <button class="tab active" id="tab-chat" data-action="switchTab" data-tab="chat">&#128172; Chat</button>
@@ -466,4 +468,5 @@ class OrkestraPanel {
     }
 }
 exports.OrkestraPanel = OrkestraPanel;
+OrkestraPanel.viewType = 'cesaflow.sidebar';
 //# sourceMappingURL=panel.js.map
