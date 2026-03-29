@@ -6,6 +6,13 @@
 set -euo pipefail
 VSCODE_DIR="${1:-vscode}"
 
+# BSD sed (macOS) requires -i '' while GNU sed (Linux) uses -i
+if [[ "$(uname)" == "Darwin" ]]; then
+  SED_I=(sed -i '')
+else
+  SED_I=(sed -i)
+fi
+
 echo "=== CesaFlow patches → $VSCODE_DIR ==="
 
 # ── Patch 1: Help menu — remove social/Twitter links ─────────────────────────
@@ -13,9 +20,9 @@ echo "=== CesaFlow patches → $VSCODE_DIR ==="
 HELP_ACTIONS="$VSCODE_DIR/src/vs/workbench/contrib/help/browser/helpActions.ts"
 if [ -f "$HELP_ACTIONS" ]; then
   # Remove "Follow us on Twitter/X" menu item
-  sed -i '/twitter\.com\|x\.com\/code\|Follow us on/d' "$HELP_ACTIONS"
+  "${SED_I[@]}" '/twitter\.com\|x\.com\/code\|Follow us on/d' "$HELP_ACTIONS"
   # Remove "Join Us on YouTube" menu item
-  sed -i '/youtube\.com.*vscode\|Join Us on YouTube/d' "$HELP_ACTIONS"
+  "${SED_I[@]}" '/youtube\.com.*vscode\|Join Us on YouTube/d' "$HELP_ACTIONS"
   echo "✓ Help menu: social links removed"
 else
   echo "⚠ $HELP_ACTIONS not found, skipping"
@@ -25,13 +32,13 @@ fi
 # Remove "Turn on Settings Sync..." from the accounts menu
 SYNC_FILE="$VSCODE_DIR/src/vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService.ts"
 if [ -f "$SYNC_FILE" ]; then
-  sed -i "s/'Turn on Settings Sync\.\.\.'/''/g" "$SYNC_FILE"
+  "${SED_I[@]}" "s/'Turn on Settings Sync\.\.\.'/''/g" "$SYNC_FILE"
   echo "✓ Settings Sync: turn-on prompt disabled"
 else
   # Try alternate path
   SYNC_FILE2=$(find "$VSCODE_DIR/src" -name "userDataSyncWorkbenchService.ts" 2>/dev/null | head -1)
   if [ -n "$SYNC_FILE2" ]; then
-    sed -i "s/'Turn on Settings Sync\.\.\.'/''/g" "$SYNC_FILE2"
+    "${SED_I[@]}" "s/'Turn on Settings Sync\.\.\.'/''/g" "$SYNC_FILE2"
     echo "✓ Settings Sync: turn-on prompt disabled (alt path)"
   else
     echo "⚠ Settings Sync file not found, skipping"
@@ -41,8 +48,8 @@ fi
 # ── Patch 3: Welcome page — replace VS Code references ───────────────────────
 WELCOME_HTML="$VSCODE_DIR/src/vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent.ts"
 if [ -f "$WELCOME_HTML" ]; then
-  sed -i 's/Visual Studio Code/CesaFlow IDE/g' "$WELCOME_HTML"
-  sed -i 's/VS Code/CesaFlow IDE/g' "$WELCOME_HTML"
+  "${SED_I[@]}" 's/Visual Studio Code/CesaFlow IDE/g' "$WELCOME_HTML"
+  "${SED_I[@]}" 's/VS Code/CesaFlow IDE/g' "$WELCOME_HTML"
   echo "✓ Welcome page: VS Code → CesaFlow IDE"
 else
   echo "⚠ Getting started content not found, skipping"
@@ -51,7 +58,7 @@ fi
 # ── Patch 4: Window title — remove "Visual Studio Code" suffix ───────────────
 WINDOW_TITLE="$VSCODE_DIR/src/vs/workbench/browser/parts/titlebar/titlebarPart.ts"
 if [ -f "$WINDOW_TITLE" ]; then
-  sed -i 's/Visual Studio Code/CesaFlow IDE/g' "$WINDOW_TITLE"
+  "${SED_I[@]}" 's/Visual Studio Code/CesaFlow IDE/g' "$WINDOW_TITLE"
   echo "✓ Title bar: Visual Studio Code → CesaFlow IDE"
 else
   echo "⚠ Titlebar part not found, skipping"
@@ -63,7 +70,7 @@ if [ -z "$ABOUT_FILE" ]; then
   ABOUT_FILE=$(find "$VSCODE_DIR/src" -name "issueReporter.ts" 2>/dev/null | head -1)
 fi
 if [ -n "$ABOUT_FILE" ]; then
-  sed -i 's/Visual Studio Code/CesaFlow IDE/g' "$ABOUT_FILE"
+  "${SED_I[@]}" 's/Visual Studio Code/CesaFlow IDE/g' "$ABOUT_FILE"
   echo "✓ About dialog: patched"
 else
   echo "⚠ About/issue reporter not found, skipping"
@@ -74,7 +81,7 @@ fi
 REMOTE_STATUS="$VSCODE_DIR/src/vs/workbench/contrib/remote/browser/remoteStatusBarEntry.ts"
 if [ -f "$REMOTE_STATUS" ]; then
   # Make the remote indicator hidden by default (return early before registering)
-  sed -i 's/StatusbarAlignment\.LEFT, Number\.MIN_VALUE/StatusbarAlignment.LEFT, Number.MIN_VALUE, true \/\/ disabled/' "$REMOTE_STATUS" || true
+  "${SED_I[@]}" 's/StatusbarAlignment\.LEFT, Number\.MIN_VALUE/StatusbarAlignment.LEFT, Number.MIN_VALUE, true \/\/ disabled/' "$REMOTE_STATUS" || true
   echo "✓ Remote status bar: patched"
 else
   echo "⚠ Remote status bar entry not found, skipping"
@@ -90,7 +97,7 @@ fi
 ACCOUNTS_SERVICE=$(find "$VSCODE_DIR/src" -name "accountsStatusBarItem.ts" 2>/dev/null | head -1)
 if [ -n "$ACCOUNTS_SERVICE" ]; then
   # Set the accounts item to not show by default when no accounts provider is registered
-  sed -i 's/StatusbarAlignment\.RIGHT, Number\.MAX_VALUE/StatusbarAlignment.RIGHT, Number.MAX_VALUE/' "$ACCOUNTS_SERVICE" || true
+  "${SED_I[@]}" 's/StatusbarAlignment\.RIGHT, Number\.MAX_VALUE/StatusbarAlignment.RIGHT, Number.MAX_VALUE/' "$ACCOUNTS_SERVICE" || true
   echo "✓ Accounts status bar: patched"
 else
   echo "⚠ Accounts status bar item not found, skipping"
@@ -101,8 +108,8 @@ fi
 WALKTHROUGHS=$(find "$VSCODE_DIR/src/vs/workbench/contrib/welcomeGettingStarted" -name "*.ts" 2>/dev/null)
 for f in $WALKTHROUGHS; do
   if grep -q "Visual Studio Code\|vscode\.dev" "$f" 2>/dev/null; then
-    sed -i 's/Visual Studio Code/CesaFlow IDE/g' "$f"
-    sed -i 's/vscode\.dev/cesaflow\.ai/g' "$f"
+    "${SED_I[@]}" 's/Visual Studio Code/CesaFlow IDE/g' "$f"
+    "${SED_I[@]}" 's/vscode\.dev/cesaflow\.ai/g' "$f"
     echo "✓ Walkthrough: $f patched"
   fi
 done
