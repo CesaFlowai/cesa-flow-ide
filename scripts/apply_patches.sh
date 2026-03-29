@@ -107,4 +107,20 @@ for f in $WALKTHROUGHS; do
   fi
 done
 
+# ── Patch 9: Inject CesaFlow UI overrides (rounded corners, shadows) ─────────
+# Appends styles/cesaflow-ui.css to VS Code's main workbench CSS.
+# This runs after VS Code source is cloned, before npm install.
+WORKBENCH_CSS="$VSCODE_DIR/src/vs/workbench/browser/workbench.css"
+UI_CSS="styles/cesaflow-ui.css"
+
+if [ -f "$WORKBENCH_CSS" ] && [ -f "$UI_CSS" ]; then
+  echo "" >> "$WORKBENCH_CSS"
+  cat "$UI_CSS" >> "$WORKBENCH_CSS"
+  echo "✓ UI overrides: cesaflow-ui.css injected into workbench.css"
+elif [ ! -f "$WORKBENCH_CSS" ]; then
+  echo "⚠ workbench.css not found at $WORKBENCH_CSS, skipping UI overrides"
+else
+  echo "⚠ styles/cesaflow-ui.css not found, skipping UI overrides"
+fi
+
 echo "=== Patches complete ==="

@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CesaFlow IDE — Workbench Visual Overrides
+   Appended to src/vs/workbench/browser/workbench.css at build time.
+   Goal: premium, modern feel — rounded cards, soft shadows, refined spacing.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Command Palette / Quick Input ────────────────────────────────────────── */
+.quick-input-widget {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(99,102,241,0.3) !important;
+  box-shadow:
+    0 24px 64px rgba(0,0,0,0.7),
+    0 8px 24px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(99,102,241,0.1) inset !important;
+}
+
+.quick-input-widget .quick-input-header {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+.quick-input-widget .monaco-inputbox {
+  border-radius: 10px !important;
+  margin: 4px 8px !important;
+}
+
+.quick-input-widget .quick-input-list {
+  padding: 4px 4px 6px !important;
+}
+
+.quick-input-widget .monaco-list .monaco-list-row {
+  border-radius: 8px !important;
+  margin: 1px 4px !important;
+  width: calc(100% - 8px) !important;
+}
+
+/* ── Context Menu ─────────────────────────────────────────────────────────── */
+.context-view .monaco-menu {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  padding: 5px !important;
+  border: 1px solid rgba(99,102,241,0.2) !important;
+  box-shadow:
+    0 16px 48px rgba(0,0,0,0.6),
+    0 4px 16px rgba(0,0,0,0.4) !important;
+}
+
+.context-view .monaco-menu .monaco-action-bar .action-item .action-label {
+  border-radius: 7px !important;
+  padding: 4px 10px !important;
+}
+
+.context-view .monaco-menu .monaco-menu-item.action-item {
+  border-radius: 7px !important;
+  margin: 1px 3px !important;
+}
+
+/* ── Notification Toasts ──────────────────────────────────────────────────── */
+.notification-toast {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(99,102,241,0.15) !important;
+  box-shadow:
+    0 12px 36px rgba(0,0,0,0.55),
+    0 4px 12px rgba(0,0,0,0.35) !important;
+}
+
+/* ── Suggest Widget (Autocomplete popup) ──────────────────────────────────── */
+.suggest-widget {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(99,102,241,0.2) !important;
+  box-shadow:
+    0 12px 36px rgba(0,0,0,0.6),
+    0 4px 14px rgba(0,0,0,0.4) !important;
+}
+
+.suggest-widget .monaco-list .monaco-list-row {
+  border-radius: 6px !important;
+  margin: 1px 3px !important;
+  width: calc(100% - 6px) !important;
+}
+
+/* ── Hover Info Box ───────────────────────────────────────────────────────── */
+.monaco-editor-hover {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(99,102,241,0.2) !important;
+  box-shadow:
+    0 8px 28px rgba(0,0,0,0.5),
+    0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+.monaco-editor-hover .hover-row {
+  padding: 4px 2px !important;
+}
+
+/* ── Parameter Hints ──────────────────────────────────────────────────────── */
+.parameter-hints-widget {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(99,102,241,0.2) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45) !important;
+}
+
+/* ── Find / Replace Widget ────────────────────────────────────────────────── */
+.editor-widget.find-widget {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(99,102,241,0.25) !important;
+  box-shadow:
+    0 8px 28px rgba(0,0,0,0.5),
+    0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+/* ── Editor Tabs ──────────────────────────────────────────────────────────── */
+.tabs-container > .tab {
+  border-top-left-radius: 6px !important;
+  border-top-right-radius: 6px !important;
+  margin-right: 2px !important;
+  margin-top: 4px !important;
+  border: none !important;
+}
+
+.tabs-container > .tab.active {
+  margin-top: 2px !important;
+}
+
+/* ── Panel (Terminal / Output) ────────────────────────────────────────────── */
+.monaco-workbench .part.panel {
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.monaco-workbench .part.panel > .title {
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* ── Sidebar section headers ──────────────────────────────────────────────── */
+.pane-header {
+  border-radius: 8px !important;
+  margin: 2px 6px !important;
+  padding: 0 8px !important;
+}
+
+/* ── Sidebar list/tree rows — Cursor-style rounded rows ──────────────────── */
+.monaco-workbench .sidebar .monaco-list .monaco-list-row,
+.monaco-workbench .auxiliary-bar .monaco-list .monaco-list-row {
+  border-radius: 6px !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+  width: calc(100% - 8px) !important;
+}
+
+/* ── Activity Bar ─────────────────────────────────────────────────────────── */
+.monaco-workbench .activitybar > .content .monaco-action-bar .action-item > .action-label {
+  border-radius: 10px !important;
+}
+
+/* Active indicator pill */
+.monaco-workbench .activitybar > .content .monaco-action-bar .action-item.checked .active-item-indicator:before {
+  border-radius: 0 4px 4px 0 !important;
+  width: 3px !important;
+}
+
+/* ── Buttons — pill style ─────────────────────────────────────────────────── */
+.monaco-button {
+  border-radius: 8px !important;
+}
+
+.monaco-button.monaco-text-button {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px !important;
+}
+
+/* ── Input / Textbox ──────────────────────────────────────────────────────── */
+.monaco-inputbox {
+  border-radius: 8px !important;
+}
+
+.monaco-inputbox > .ibwrapper > .input {
+  border-radius: 8px !important;
+}
+
+/* ── Dropdown / Select ────────────────────────────────────────────────────── */
+.monaco-select-box {
+  border-radius: 8px !important;
+}
+
+/* ── Scrollbar — slim pill ────────────────────────────────────────────────── */
+.monaco-scrollable-element > .scrollbar > .slider {
+  border-radius: 10px !important;
+}
+
+.monaco-scrollable-element > .scrollbar.vertical {
+  width: 8px !important;
+}
+
+.monaco-scrollable-element > .scrollbar.vertical > .slider {
+  width: 4px !important;
+  left: 2px !important;
+  border-radius: 10px !important;
+}
+
+.monaco-scrollable-element > .scrollbar.horizontal {
+  height: 8px !important;
+}
+
+.monaco-scrollable-element > .scrollbar.horizontal > .slider {
+  height: 4px !important;
+  top: 2px !important;
+  border-radius: 10px !important;
+}
+
+/* ── Status Bar Items ─────────────────────────────────────────────────────── */
+.statusbar-item {
+  border-radius: 5px !important;
+  margin: 3px 1px !important;
+}
+
+/* ── Badge (notification count) ──────────────────────────────────────────── */
+.monaco-workbench .activitybar .badge .badge-content {
+  border-radius: 20px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+}
+
+/* ── Settings editor ──────────────────────────────────────────────────────── */
+.settings-editor .settings-toc-container .monaco-list .monaco-list-row {
+  border-radius: 6px !important;
+  margin: 1px 4px !important;
+  width: calc(100% - 8px) !important;
+}
+
+/* ── Keybinding label ─────────────────────────────────────────────────────── */
+.keybinding-label {
+  border-radius: 5px !important;
+}
+
+/* ── Peek view ────────────────────────────────────────────────────────────── */
+.monaco-editor .peekview-widget > .head {
+  border-radius: 10px 10px 0 0 !important;
+}
+
+.monaco-editor .peekview-widget {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+/* ── Decorative: subtle glow on focused editor ────────────────────────────── */
+.monaco-editor.focused {
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.08) inset !important;
+}
+
+/* ── Tooltip ──────────────────────────────────────────────────────────────── */
+.monaco-tooltip {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45) !important;
+}
+
+/* ── Breadcrumb ───────────────────────────────────────────────────────────── */
+.monaco-breadcrumbs .monaco-breadcrumb-item {
+  border-radius: 5px !important;
+}
+
+/* ── Dropdown widget (hover) ──────────────────────────────────────────────── */
+.dropdown-with-primary > .action-dropdown-item > .dropdown-action {
+  border-radius: 6px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
